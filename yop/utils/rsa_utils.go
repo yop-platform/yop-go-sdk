@@ -24,14 +24,18 @@ func RsaSignBase64(content string, privateKey string, hash crypto.Hash) (string,
 
 // VerifySign 验签
 func VerifySign(content string, signature string, pubKey string, hash crypto.Hash) bool {
-	hashed := sha256.Sum256([]byte(content))
 	pubKey = FormatPemKey(pubKey, "PUBLIC KEY")
 	publicKey, err := ParsePublicKey(pubKey)
 	if err != nil {
 		return false
 	}
 	sig, _ := base64.RawURLEncoding.DecodeString(signature)
-	err = rsa.VerifyPKCS1v15(publicKey, hash, hashed[:], sig)
+	return Verify([]byte(content), sig, publicKey, crypto.SHA256)
+}
+
+func Verify(content []byte, signature []byte, pub *rsa.PublicKey, hash crypto.Hash) bool {
+	hashed := sha256.Sum256(content)
+	err := rsa.VerifyPKCS1v15(pub, hash, hashed[:], signature)
 	if err != nil {
 		return false
 	}
@@ -99,4 +103,10 @@ func FormatPemKey(yopFormKey string, pemHeader string) string {
 	sb.WriteString(pemHeader)
 	sb.WriteString("-----\n")
 	return sb.String()
+}
+
+func RsaDecrypt(priKey string, cipher string) ([]byte, error) {
+	privateKey, _ := ParsePrivateKey(priKey)
+	cipherBytes, _ := base64.RawURLEncoding.DecodeString(cipher)
+	return rsa.DecryptPKCS1v15(rand.Reader, privateKey.(*rsa.PrivateKey), cipherBytes)
 }
