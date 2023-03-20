@@ -6,8 +6,8 @@
 package client
 
 import (
-	response "github.com/yop-platform/yop-go-sdk/yop/reqponse"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
+	response "github.com/yop-platform/yop-go-sdk/yop/response"
 )
 
 type YopClient interface {

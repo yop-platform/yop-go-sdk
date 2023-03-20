@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	SERVER_ROOT     = "http://openapi.yeepay.com/yop-center"
-	YOS_SERVER_ROOT = "http://yos.yeepay.com/yop-center"
+	SERVER_ROOT     = "https://openapi.yeepay.com/yop-center"
+	YOS_SERVER_ROOT = "https://yos.yeepay.com/yop-center"
 )
 
 type YopRequest struct {

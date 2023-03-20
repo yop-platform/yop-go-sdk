@@ -14,8 +14,8 @@ import (
 	"strings"
 )
 
-// DecryptCallBack 解密回调通知内容
-func DecryptCallBack(platformPubKey string, isvPriKey string, callBack string) (string, error) {
+// DecryptCallback 解密回调通知内容
+func DecryptCallback(platformPubKey string, isvPriKey string, callBack string) (string, error) {
 	cipherText := strings.Split(callBack, "$")
 	if len(cipherText) != 4 {
 		return "", errors.New("response invalid")
