@@ -13,12 +13,6 @@ type YopResponse struct {
 	stringResult string
 }
 
-type YosUploadResponse struct {
-	metadata     *YosUploadResponseMetadata
-	result       any
-	stringResult string
-}
-
 type YosDownloadResponse struct {
 }
 
@@ -29,9 +23,8 @@ type YopResponseMetadata struct {
 	date            time.Time
 	server          string
 	yopCertSerialNo string
+	crc64ECMA       string
 }
 
-type YosUploadResponseMetadata struct {
-	YopResponseMetadata
-	crc64ECMA string
+type HttpResponseAnalyzer interface {
 }
