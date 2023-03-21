@@ -6,12 +6,14 @@
 package client
 
 import (
+	"bytes"
 	"errors"
 	"github.com/yop-platform/yop-go-sdk/yop/auth"
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
 	"github.com/yop-platform/yop-go-sdk/yop/response"
 	"github.com/yop-platform/yop-go-sdk/yop/utils"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -83,15 +85,21 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 		if 0 < len(encodedParam) && putParamsInUri {
 			uri += "?" + encodedParam
 		}
+		var body io.Reader = nil
 		if 0 == strings.Compare(constants.GET_HTTP_METHOD, yopRequest.HttpMethod) {
-			httpRequest, _ := http.NewRequest("GET", uri, nil)
-			result = *httpRequest
-		}
 
+		} else if 0 == strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod) {
+			if 0 < len(yopRequest.Content) {
+				body = bytes.NewBuffer([]byte(yopRequest.Content))
+			}
+		}
+		httpRequest, _ := http.NewRequest(yopRequest.HttpMethod, uri, body)
+		result = *httpRequest
 	}
 	for k, v := range yopRequest.Headers {
 		result.Header.Set(k, v)
 	}
+	result.Header.Set(constants.CONTENT_TYPE, getContentType(yopRequest))
 	return result, err
 }
 
@@ -106,7 +114,7 @@ func checkForMultiPart(yopRequest request.YopRequest) (bool, error) {
 }
 
 func getContentType(yopRequest request.YopRequest) string {
-	if 0 == strings.Compare("POST", yopRequest.HttpMethod) && 0 == len(yopRequest.Content) {
+	if 0 == strings.Compare("POST", yopRequest.HttpMethod) && 0 < len(yopRequest.Content) {
 		return constants.YOP_HTTP_CONTENT_TYPE_JSON
 	}
 	if 0 < len(yopRequest.Params) {
