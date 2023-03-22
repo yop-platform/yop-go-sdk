@@ -17,6 +17,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"runtime"
 	"strings"
 )
@@ -86,11 +87,18 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 			uri += "?" + encodedParam
 		}
 		var body io.Reader = nil
-		if 0 == strings.Compare(constants.GET_HTTP_METHOD, yopRequest.HttpMethod) {
-
-		} else if 0 == strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod) {
+		if 0 == strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod) {
 			if 0 < len(yopRequest.Content) {
 				body = bytes.NewBuffer([]byte(yopRequest.Content))
+			} else {
+				formValues := url.Values{}
+				for k, v := range yopRequest.Params {
+					for i := range v {
+						formValues.Set(k, v[i])
+					}
+				}
+				formDataStr := formValues.Encode()
+				body = bytes.NewBuffer([]byte(formDataStr))
 			}
 		}
 		httpRequest, _ := http.NewRequest(yopRequest.HttpMethod, uri, body)

@@ -56,7 +56,7 @@ func (signer *RsaSigner) SignRequest(yopRequest *request.YopRequest) {
 
 func calculateContentHash(yopRequest *request.YopRequest) string {
 	var encodedParameters = ""
-	if 0 == strings.Compare("POST", yopRequest.HttpMethod) && 0 == len(yopRequest.Content) {
+	if utils.UsePayloadForQueryParameters(yopRequest) {
 		encodedParameters = utils.GetCanonicalQueryString(yopRequest.Params)
 	} else {
 		encodedParameters = yopRequest.Content
@@ -80,7 +80,7 @@ func buildAuthString(appId string) string {
 }
 
 func getCanonicalQueryString(yopRequest *request.YopRequest) string {
-	if 0 == strings.Compare("POST", yopRequest.HttpMethod) && 0 == len(yopRequest.Content) {
+	if utils.UsePayloadForQueryParameters(yopRequest) {
 		return ""
 	}
 	return utils.GetCanonicalQueryString(yopRequest.Params)
