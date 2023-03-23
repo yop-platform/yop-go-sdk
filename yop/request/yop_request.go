@@ -75,7 +75,7 @@ func BuildYopRequest() *YopRequest {
 	return &YopRequest{RequestId: uuid.NewV4().String(), IsvPriKey: isvPriKey, PlatformPubKey: platformCert, Params: map[string][]string{}, Headers: map[string]string{}, Files: map[string]*os.File{}}
 }
 
-func (request *YopRequest) handleServerRoot() {
+func (request *YopRequest) HandleServerRoot() {
 	if 0 != len(request.ServerRoot) {
 		return
 	}

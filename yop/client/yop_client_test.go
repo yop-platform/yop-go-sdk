@@ -47,16 +47,16 @@ var (
 
 func buildGetYopRequest() *request.YopRequest {
 	var priKey = &request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
-	var result = request.BuildYopRequest()
+	var yopRequest = request.BuildYopRequest()
 	var platformPub = &request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
-	result.PlatformPubKey = platformPub
-	result.AppId = "app_15958159879157110001"
-	result.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
-	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
-	result.HttpMethod = constants.GET_HTTP_METHOD
-	result.IsvPriKey = priKey
-	result.AddParam("string0", "le1")
-	return result
+	yopRequest.PlatformPubKey = platformPub
+	yopRequest.AppId = "app_15958159879157110001"
+	yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
+	yopRequest.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
+	yopRequest.HttpMethod = constants.GET_HTTP_METHOD
+	yopRequest.IsvPriKey = priKey
+	yopRequest.AddParam("string0", "le1")
+	return yopRequest
 }
 
 func buildJsonYopRequest() *request.YopRequest {

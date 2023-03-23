@@ -32,8 +32,7 @@ type YopClient struct {
 // Request 普通请求
 func (yopClient *YopClient) Request(request request.YopRequest) (*response.YopResponse, error) {
 	log.Println("requestId:" + request.RequestId)
-	addStandardHeaders(request)
-
+	initRequest(request)
 	var signer = auth.RsaSigner{}
 	signer.SignRequest(request)
 
@@ -54,17 +53,12 @@ func (yopClient *YopClient) Request(request request.YopRequest) (*response.YopRe
 	}
 	return &yopResponse, nil
 }
-
-// Upload 文件上传
-func (*YopClient) Upload(request *request.YopRequest) *response.YopResponse {
-	return nil
+func initRequest(request request.YopRequest) {
+	if 0 == len(request.ServerRoot) {
+		request.HandleServerRoot()
+	}
+	addStandardHeaders(request)
 }
-
-// Download 文件下载
-func (*YopClient) Download(request *request.YopRequest) *response.YopResponse {
-	return nil
-}
-
 func addStandardHeaders(yopRequest request.YopRequest) {
 	yopRequest.Headers[constants.YOP_REQUEST_ID] = yopRequest.RequestId
 	yopRequest.Headers[constants.YOP_APPKEY_HEADER_KEY] = yopRequest.AppId
