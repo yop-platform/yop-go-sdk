@@ -39,7 +39,7 @@ type YopRequest struct {
 	// 请求头
 	Headers map[string]string
 	// 文件
-	Files map[string]os.File
+	Files map[string]*os.File
 }
 
 func (request *YopRequest) AddParam(name string, value any) {
@@ -49,6 +49,10 @@ func (request *YopRequest) AddParam(name string, value any) {
 	var strValue = ToStringE(value)
 	var paramArray = []string{strValue}
 	request.Params[name] = paramArray
+}
+
+func (request *YopRequest) AddFile(name string, f *os.File) {
+	request.Files[name] = f
 }
 
 type IsvPriKey struct {
@@ -68,7 +72,7 @@ type PlatformPubKey struct {
 func BuildYopRequest() *YopRequest {
 	var isvPriKey = &IsvPriKey{CertType: RSA2048}
 	var platformCert = &PlatformPubKey{CertType: RSA2048}
-	return &YopRequest{RequestId: uuid.NewV4().String(), IsvPriKey: isvPriKey, PlatformPubKey: platformCert, Params: map[string][]string{}, Headers: map[string]string{}}
+	return &YopRequest{RequestId: uuid.NewV4().String(), IsvPriKey: isvPriKey, PlatformPubKey: platformCert, Params: map[string][]string{}, Headers: map[string]string{}, Files: map[string]*os.File{}}
 }
 
 func (request *YopRequest) handleServerRoot() {

@@ -13,7 +13,7 @@ import (
 func TestRsaSigner_SignRequest(t *testing.T) {
 	var yopRequest = buildYopRequest()
 	var signer = RsaSigner{}
-	signer.SignRequest(yopRequest)
+	signer.SignRequest(*yopRequest)
 	t.Log(yopRequest.Headers)
 }
 

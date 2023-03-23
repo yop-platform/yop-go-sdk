@@ -28,13 +28,13 @@ type YopSigner interface {
 	SignRequest(yopRequest request.YopRequest)
 
 	// VerifyResponse 响应报文验签
-	VerifyResponse(signature string, pubKey request.PlatformPubKey)
+	VerifyResponse(content string, signature string, pubKey request.PlatformPubKey) bool
 }
 
 type RsaSigner struct {
 }
 
-func (signer *RsaSigner) SignRequest(yopRequest *request.YopRequest) {
+func (signer *RsaSigner) SignRequest(yopRequest request.YopRequest) {
 	var authString = buildAuthString(yopRequest.AppId)
 	log.Println("authString:" + authString)
 
@@ -42,7 +42,7 @@ func (signer *RsaSigner) SignRequest(yopRequest *request.YopRequest) {
 	log.Println("contentHash:" + contentHash)
 	yopRequest.Headers[constants.YOP_CONTENT_SHA256] = contentHash
 
-	var headerToSign = getHeaderToSign(*yopRequest)
+	var headerToSign = getHeaderToSign(yopRequest)
 	var canonicalRequest = buildCanonicalRequest(yopRequest, authString, headerToSign)
 	log.Println("canonicalRequest:" + canonicalRequest)
 
@@ -54,7 +54,13 @@ func (signer *RsaSigner) SignRequest(yopRequest *request.YopRequest) {
 	yopRequest.Headers[constants.AUTHORIZATION] = authorizationHeader
 }
 
-func calculateContentHash(yopRequest *request.YopRequest) string {
+func (signer *RsaSigner) VerifyResponse(content string, signature string, pubKey request.PlatformPubKey) bool {
+	content = strings.ReplaceAll(content, "\n", "")
+	content = strings.ReplaceAll(content, " ", "")
+	return utils.VerifySign(content, signature, pubKey.Value, crypto.SHA256)
+}
+
+func calculateContentHash(yopRequest request.YopRequest) string {
 	var encodedParameters = ""
 	if utils.UsePayloadForQueryParameters(yopRequest) {
 		encodedParameters = utils.GetCanonicalQueryString(yopRequest.Params)
@@ -65,21 +71,17 @@ func calculateContentHash(yopRequest *request.YopRequest) string {
 	return fmt.Sprintf("%x", sha256.Sum256([]byte(encodedParameters)))
 }
 
-func (signer *RsaSigner) VerifyResponse(signature string, pubKey request.PlatformPubKey) {
-
-}
-
-func buildCanonicalRequest(yopRequest *request.YopRequest, authString string, headerToSign []string) string {
+func buildCanonicalRequest(yopRequest request.YopRequest, authString string, headerToSign []string) string {
 	var canonicalQueryString = getCanonicalQueryString(yopRequest)
 	var canonicalURI = getCanonicalURIPath(yopRequest.ApiUri)
-	return authString + "\n" + yopRequest.HttpMethod + "\n" + canonicalURI + "\n" + canonicalQueryString + "\n" + getCanonicalHeaders(*yopRequest, headerToSign)
+	return authString + "\n" + yopRequest.HttpMethod + "\n" + canonicalURI + "\n" + canonicalQueryString + "\n" + getCanonicalHeaders(yopRequest, headerToSign)
 }
 func buildAuthString(appId string) string {
 	var t = time.Now()
 	return constants.DEFAULT_YOP_PROTOCOL_VERSION + "/" + appId + "/" + t.Format(FormatISOTime) + "/" + strconv.Itoa(constants.DEFAULT_EXPIRATION_IN_SECONDS)
 }
 
-func getCanonicalQueryString(yopRequest *request.YopRequest) string {
+func getCanonicalQueryString(yopRequest request.YopRequest) string {
 	if utils.UsePayloadForQueryParameters(yopRequest) {
 		return ""
 	}

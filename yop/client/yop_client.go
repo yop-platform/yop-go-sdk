@@ -16,6 +16,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"runtime"
@@ -28,24 +29,30 @@ type YopClient struct {
 	*http.Client
 }
 
-var signer = auth.RsaSigner{}
-
 // Request 普通请求
-func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopResponse, error) {
+func (yopClient *YopClient) Request(request request.YopRequest) (*response.YopResponse, error) {
 	log.Println("requestId:" + request.RequestId)
 	addStandardHeaders(request)
 
+	var signer = auth.RsaSigner{}
 	signer.SignRequest(request)
 
-	httpRequest, err := buildHttpRequest(*request)
+	httpRequest, err := buildHttpRequest(request)
 	if nil != err {
 		return nil, err
 	}
-	resp, _ := yopClient.Client.Do(&httpRequest)
+	httpResp, _ := yopClient.Client.Do(&httpRequest)
 
-	body, _ := ioutil.ReadAll(resp.Body)
-	log.Println(string(body))
-	return nil, nil
+	body, _ := ioutil.ReadAll(httpResp.Body)
+	var yopResponse = response.YopResponse{Content: string(body)}
+	context := response.RespHandleContext{YopSigner: &signer, YopResponse: &yopResponse, YopRequest: request}
+	for i := range response.ANALYZER_CHAIN {
+		err = response.ANALYZER_CHAIN[i].Analyze(context, httpResp)
+		if nil != err {
+			return nil, err
+		}
+	}
+	return &yopResponse, nil
 }
 
 // Upload 文件上传
@@ -58,18 +65,17 @@ func (*YopClient) Download(request *request.YopRequest) *response.YopResponse {
 	return nil
 }
 
-func addStandardHeaders(yopRequest *request.YopRequest) {
+func addStandardHeaders(yopRequest request.YopRequest) {
 	yopRequest.Headers[constants.YOP_REQUEST_ID] = yopRequest.RequestId
 	yopRequest.Headers[constants.YOP_APPKEY_HEADER_KEY] = yopRequest.AppId
 	yopRequest.Headers[constants.USER_AGENT_HEADER_KEY] = buildUserAgent()
 }
 
 func buildUserAgent() string {
-	return "go" + "/" + "4.0.0" + "/" + runtime.GOOS + "/" + runtime.Version() + runtime.GOROOT()
+	return "go" + "/" + "4.3.0" + "/" + runtime.GOOS + "/" + runtime.Version() + runtime.GOROOT()
 }
 
 func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
-	var err error = nil
 	var uri = yopRequest.ServerRoot + yopRequest.ApiUri
 	isMultiPart, err := checkForMultiPart(yopRequest)
 	if nil != err {
@@ -77,7 +83,30 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 	}
 	var result http.Request
 	if isMultiPart {
+		bodyBuf := &bytes.Buffer{}
+		bodyWriter := multipart.NewWriter(bodyBuf)
 
+		for k, v := range yopRequest.Params {
+			for i := range v {
+				bodyWriter.WriteField(k, v[i])
+			}
+		}
+
+		for k, v := range yopRequest.Files {
+			fileWriter, _ := bodyWriter.CreateFormFile(k, v.Name())
+			io.Copy(fileWriter, v)
+		}
+		bodyWriter.Close()
+
+		if err != nil {
+			return http.Request{}, err
+		}
+		req, err := http.NewRequest("POST", uri, bodyBuf)
+		if nil != err {
+			return http.Request{}, err
+		}
+		req.Header.Set("Content-Type", bodyWriter.FormDataContentType())
+		result = *req
 	} else {
 		var encodedParam = utils.EncodeParameters(yopRequest.Params)
 		var requestHasPayload = 0 < len(yopRequest.Content)
@@ -101,19 +130,22 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 				body = bytes.NewBuffer([]byte(formDataStr))
 			}
 		}
-		httpRequest, _ := http.NewRequest(yopRequest.HttpMethod, uri, body)
+		httpRequest, err := http.NewRequest(yopRequest.HttpMethod, uri, body)
+		if err != nil {
+			return http.Request{}, err
+		}
 		result = *httpRequest
+		result.Header.Set(constants.CONTENT_TYPE, getContentType(yopRequest))
 	}
 	for k, v := range yopRequest.Headers {
 		result.Header.Set(k, v)
 	}
-	result.Header.Set(constants.CONTENT_TYPE, getContentType(yopRequest))
 	return result, err
 }
 
 func checkForMultiPart(yopRequest request.YopRequest) (bool, error) {
 	var result = nil != yopRequest.Files && 0 < len(yopRequest.Files)
-	if result && 0 == strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod) {
+	if result && 0 != strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod) {
 		var errorMsg = "ContentType:multipart/form-data only support Post Request"
 		log.Fatal(errorMsg)
 		return false, errors.New(errorMsg)

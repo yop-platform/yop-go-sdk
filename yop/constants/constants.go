@@ -16,6 +16,10 @@ const (
 	USER_AGENT_HEADER_KEY         = "User-Agent"
 	CONTENT_TYPE                  = "Content-Type"
 	DEFAULT_USER_AGENT            = ""
+	YOP_SIGN                      = "x-yop-sign"
+	YOP_SIGN_CERT_SERIAL_NO       = "x-yop-sign-serial-no"
+	DATE                          = "Date"
+	YOP_HASH_CRC64ECMA            = "x-yop-hash-crc64ecma"
 
 	YOP_HTTP_CONTENT_TYPE_JSON           = "application/json"
 	YOP_HTTP_CONTENT_TYPE_FORM           = "application/x-www-form-urlencoded"
@@ -25,4 +29,7 @@ const (
 
 	POST_HTTP_METHOD = "POST"
 	GET_HTTP_METHOD  = "GET"
+
+	SC_OK         = 200
+	SC_NO_CONTENT = 204
 )

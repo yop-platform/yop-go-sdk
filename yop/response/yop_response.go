@@ -5,26 +5,32 @@
 // @time      : 2023/3/16 3:22 PM
 package response
 
-import "time"
+import (
+	"github.com/yop-platform/yop-go-sdk/yop/auth"
+	"github.com/yop-platform/yop-go-sdk/yop/request"
+	"time"
+)
 
 type YopResponse struct {
-	metadata     *YopResponseMetadata
-	result       any
-	stringResult string
-}
-
-type YosDownloadResponse struct {
+	Metadata *YopResponseMetadata
+	Result   any
+	// http请求收到的原始响应体
+	Content string
 }
 
 type YopResponseMetadata struct {
-	yopRequestId    string
-	yopSign         string
-	contentType     string
-	date            time.Time
-	server          string
-	yopCertSerialNo string
-	crc64ECMA       string
+	YopRequestId     string
+	YopContentSha256 string
+	YopSign          string
+	ContentType      string
+	Date             time.Time
+	Server           string
+	YopCertSerialNo  string
+	Crc64ECMA        string
 }
 
-type HttpResponseAnalyzer interface {
+type RespHandleContext struct {
+	auth.YopSigner
+	*YopResponse
+	request.YopRequest
 }

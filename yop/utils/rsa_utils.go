@@ -34,7 +34,12 @@ func VerifySign(content string, signature string, pubKey string, hash crypto.Has
 	if err != nil {
 		return false
 	}
-	sig, _ := base64.RawURLEncoding.DecodeString(signature)
+	var sig []byte
+	if strings.Contains(signature, "*") || strings.Contains(signature, "+") || strings.Contains(signature, "=") {
+		sig, _ = base64.StdEncoding.DecodeString(signature)
+	} else {
+		sig, _ = base64.RawURLEncoding.DecodeString(signature)
+	}
 	return Verify([]byte(content), sig, publicKey, crypto.SHA256)
 }
 

@@ -58,7 +58,7 @@ func GetCanonicalQueryString(params map[string][]string) string {
 	return strings.Join(parameterStrings, "&")
 }
 
-func UsePayloadForQueryParameters(yopRequest *request.YopRequest) bool {
+func UsePayloadForQueryParameters(yopRequest request.YopRequest) bool {
 	var requestIsPOST = 0 == strings.Compare("POST", yopRequest.HttpMethod)
 	var requestHasNoPayload = 0 == len(yopRequest.Content)
 	return requestIsPOST && requestHasNoPayload
