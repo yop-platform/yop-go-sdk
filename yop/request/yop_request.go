@@ -18,19 +18,21 @@ import (
 )
 
 const (
-	SERVER_ROOT     = "https://openapi.yeepay.com/yop-center"
-	YOS_SERVER_ROOT = "https://yos.yeepay.com/yop-center"
-	RSA2048         = "RSA2048"
+	SERVER_ROOT             = "https://openapi.yeepay.com/yop-center"
+	YOS_SERVER_ROOT         = "https://yos.yeepay.com/yop-center"
+	RSA2048                 = "RSA2048"
+	YOP_PLATFORM_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6p0XWjscY+gsyqKRhw9MeLsEmhFdBRhT2emOck/F1Omw38ZWhJxh9kDfs5HzFJMrVozgU+SJFDONxs8UB0wMILKRmqfLcfClG9MyCNuJkkfm0HFQv1hRGdOvZPXj3Bckuwa7FrEXBRYUhK7vJ40afumspthmse6bs6mZxNn/mALZ2X07uznOrrc2rk41Y2HftduxZw6T4EmtWuN2x4CZ8gwSyPAW5ZzZJLQ6tZDojBK4GZTAGhnn3bg5bBsBlw2+FLkCQBuDsJVsFPiGh/b6K/+zGTvWyUcu+LUj2MejYQELDO3i2vQXVDk7lVi2/TcUYefvIcssnzsfCfjaorxsuwIDAQAB"
 )
 
 type YopRequest struct {
 	// 服务地址，一般情况无需指定
-	ServerRoot     string
-	RequestId      string
-	ApiUri         string
-	HttpMethod     string
-	AppId          string
-	IsvPriKey      *IsvPriKey
+	ServerRoot string
+	RequestId  string
+	ApiUri     string
+	HttpMethod string
+	AppId      string
+	IsvPriKey  *IsvPriKey
+	// 平台公钥,一般情况无需指定
 	PlatformPubKey *PlatformPubKey
 	// form请求的参数
 	Params map[string][]string
@@ -71,7 +73,7 @@ type PlatformPubKey struct {
 
 func BuildYopRequest() *YopRequest {
 	var isvPriKey = &IsvPriKey{CertType: RSA2048}
-	var platformCert = &PlatformPubKey{CertType: RSA2048}
+	var platformCert = &PlatformPubKey{Value: YOP_PLATFORM_PUBLIC_KEY, CertType: RSA2048}
 	return &YopRequest{RequestId: uuid.NewV4().String(), IsvPriKey: isvPriKey, PlatformPubKey: platformCert, Params: map[string][]string{}, Headers: map[string]string{}, Files: map[string]*os.File{}}
 }
 

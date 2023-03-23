@@ -15,8 +15,6 @@ Get请求
 
 var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
 var yopRequest = request.BuildYopRequest()
-var platformPub = &request.PlatformPubKey{Value: "platformPubKey", CertType: request.RSA2048}
-yopRequest.PlatformPubKey = platformPub
 yopRequest.AppId = "appId"
 yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
 yopRequest.HttpMethod = constants.GET_HTTP_METHOD
@@ -29,8 +27,6 @@ Post Form请求
 
 var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
 var yopRequest = request.BuildYopRequest()
-var platformPub = &request.PlatformPubKey{Value: "platformPubKey", CertType: request.RSA2048}
-yopRequest.PlatformPubKey = platformPub
 yopRequest.AppId = "appId"
 yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
 yopRequest.HttpMethod = constants.POST_HTTP_METHOD
@@ -43,8 +39,6 @@ Post Json请求
 
 var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
 var yopRequest = request.BuildYopRequest()
-var platformPub = &request.PlatformPubKey{Value: "platformPubKey", CertType: request.RSA2048}
-yopRequest.PlatformPubKey = platformPub
 yopRequest.AppId = "appId"
 yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
 yopRequest.HttpMethod = constants.POST_HTTP_METHOD
@@ -59,8 +53,6 @@ yopResp, err := DefaultClient.Request(*yopRequest)
 
 var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
 var yopRequest = request.BuildYopRequest()
-var platformPub = &request.PlatformPubKey{Value: "platformPubKey", CertType: request.RSA2048}
-yopRequest.PlatformPubKey = platformPub
 yopRequest.AppId = "appId"
 yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
 yopRequest.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
@@ -75,8 +67,6 @@ yopResp, err := DefaultClient.Request(*yopRequest)
 
 var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
 var yopRequest = request.BuildYopRequest()
-var platformPub = &request.PlatformPubKey{Value: "platformPubKey", CertType: request.RSA2048}
-yopRequest.PlatformPubKey = platformPub
 yopRequest.AppId = "appId"
 yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
 yopRequest.HttpMethod = constants.GET_HTTP_METHOD
