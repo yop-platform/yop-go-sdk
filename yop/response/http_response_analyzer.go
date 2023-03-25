@@ -50,7 +50,7 @@ type YopSignatureCheckAnalyzer struct {
 func (yopSignatureCheckAnalyzer *YopSignatureCheckAnalyzer) Analyze(context RespHandleContext, httpResponse *http.Response) error {
 	var signature = context.YopResponse.Metadata.YopSign
 	if 0 < len(signature) {
-		if !context.YopSigner.VerifyResponse(context.YopResponse.Content, signature, *context.YopRequest.PlatformPubKey) {
+		if !context.YopSigner.VerifyResponse(string(context.YopResponse.Content), signature, context.YopRequest.PlatformPubKey) {
 			return errors.New("response sign verify failure")
 		}
 	}
@@ -62,9 +62,9 @@ type YopErrorResponseAnalyzer struct {
 
 func (yopErrorResponseAnalyzer *YopErrorResponseAnalyzer) Analyze(context RespHandleContext, httpResponse *http.Response) error {
 	var statusCode = httpResponse.StatusCode
-	if statusCode != constants.SC_OK && statusCode != constants.SC_NO_CONTENT {
-		log.Println("statusCode:" + strconv.Itoa(statusCode))
-		return errors.New("statusCode of httpResponse is not success code")
+	log.Println("statusCode:" + strconv.Itoa(statusCode))
+	if statusCode/100 == constants.SC_OK && statusCode != constants.SC_NO_CONTENT {
+		return nil
 	}
 	var yopServiceError = YopServiceError{}
 	json.Unmarshal([]byte(context.YopResponse.Content), &yopServiceError)
@@ -79,7 +79,7 @@ type YopJsonResponseAnalyzer struct {
 
 func (yopJsonResponseAnalyzer *YopJsonResponseAnalyzer) Analyze(context RespHandleContext, httpResponse *http.Response) error {
 	if 0 < len(context.YopResponse.Content) && strings.HasPrefix(context.YopResponse.Metadata.ContentType, constants.YOP_HTTP_CONTENT_TYPE_JSON) {
-		json.Unmarshal([]byte(context.YopResponse.Content), &context.YopResponse)
+		json.Unmarshal(context.YopResponse.Content, &context.YopResponse)
 	}
 	return nil
 }

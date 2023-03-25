@@ -8,6 +8,7 @@ package client
 import (
 	"bytes"
 	"errors"
+	uuid "github.com/satori/go.uuid"
 	"github.com/yop-platform/yop-go-sdk/yop/auth"
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
@@ -30,21 +31,20 @@ type YopClient struct {
 }
 
 // Request 普通请求
-func (yopClient *YopClient) Request(request request.YopRequest) (*response.YopResponse, error) {
-	log.Println("requestId:" + request.RequestId)
+func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopResponse, error) {
 	initRequest(request)
 	var signer = auth.RsaSigner{}
-	signer.SignRequest(request)
+	signer.SignRequest(*request)
 
-	httpRequest, err := buildHttpRequest(request)
+	httpRequest, err := buildHttpRequest(*request)
 	if nil != err {
 		return nil, err
 	}
 	httpResp, _ := yopClient.Client.Do(&httpRequest)
 
 	body, _ := ioutil.ReadAll(httpResp.Body)
-	var yopResponse = response.YopResponse{Content: string(body)}
-	context := response.RespHandleContext{YopSigner: &signer, YopResponse: &yopResponse, YopRequest: request}
+	var yopResponse = response.YopResponse{Content: body}
+	context := response.RespHandleContext{YopSigner: &signer, YopResponse: &yopResponse, YopRequest: *request}
 	for i := range response.ANALYZER_CHAIN {
 		err = response.ANALYZER_CHAIN[i].Analyze(context, httpResp)
 		if nil != err {
@@ -53,13 +53,20 @@ func (yopClient *YopClient) Request(request request.YopRequest) (*response.YopRe
 	}
 	return &yopResponse, nil
 }
-func initRequest(request request.YopRequest) {
-	if 0 == len(request.ServerRoot) {
-		request.HandleServerRoot()
+func initRequest(yopRequest *request.YopRequest) {
+	yopRequest.RequestId = uuid.NewV4().String()
+	log.Println("requestId:" + yopRequest.RequestId)
+	if 0 == len(yopRequest.ServerRoot) {
+		yopRequest.HandleServerRoot()
 	}
-	addStandardHeaders(request)
+	if 0 == len(yopRequest.PlatformPubKey.Value) {
+		yopRequest.PlatformPubKey.Value = request.YOP_PLATFORM_PUBLIC_KEY
+		yopRequest.PlatformPubKey.CertType = request.RSA2048
+	}
+	addStandardHeaders(yopRequest)
 }
-func addStandardHeaders(yopRequest request.YopRequest) {
+func addStandardHeaders(yopRequest *request.YopRequest) {
+	yopRequest.Headers = map[string]string{}
 	yopRequest.Headers[constants.YOP_REQUEST_ID] = yopRequest.RequestId
 	yopRequest.Headers[constants.YOP_APPKEY_HEADER_KEY] = yopRequest.AppId
 	yopRequest.Headers[constants.USER_AGENT_HEADER_KEY] = buildUserAgent()

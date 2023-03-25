@@ -31,9 +31,9 @@ type YopRequest struct {
 	ApiUri     string
 	HttpMethod string
 	AppId      string
-	IsvPriKey  *IsvPriKey
+	IsvPriKey  IsvPriKey
 	// 平台公钥,一般情况无需指定
-	PlatformPubKey *PlatformPubKey
+	PlatformPubKey PlatformPubKey
 	// form请求的参数
 	Params map[string][]string
 	// json请求参数
@@ -72,8 +72,8 @@ type PlatformPubKey struct {
 }
 
 func BuildYopRequest() *YopRequest {
-	var isvPriKey = &IsvPriKey{CertType: RSA2048}
-	var platformCert = &PlatformPubKey{Value: YOP_PLATFORM_PUBLIC_KEY, CertType: RSA2048}
+	var isvPriKey = IsvPriKey{CertType: RSA2048}
+	var platformCert = PlatformPubKey{Value: YOP_PLATFORM_PUBLIC_KEY, CertType: RSA2048}
 	return &YopRequest{RequestId: uuid.NewV4().String(), IsvPriKey: isvPriKey, PlatformPubKey: platformCert, Params: map[string][]string{}, Headers: map[string]string{}, Files: map[string]*os.File{}}
 }
 

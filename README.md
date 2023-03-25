@@ -14,63 +14,63 @@ Get请求
 ```go
 
 var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.BuildYopRequest()
+var yopRequest = &request.YopRequest{}
 yopRequest.AppId = "appId"
 yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
 yopRequest.HttpMethod = constants.GET_HTTP_METHOD
 yopRequest.IsvPriKey = priKey
 yopRequest.AddParam("paramName", "paramValue")
-yopResp, err := DefaultClient.Request(*yopRequest)
+yopResp, err := DefaultClient.Request(yopRequest)
 ```
 Post Form请求
 ```go
 
 var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.BuildYopRequest()
+var yopRequest = &request.YopRequest{}
 yopRequest.AppId = "appId"
 yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
 yopRequest.HttpMethod = constants.POST_HTTP_METHOD
 yopRequest.IsvPriKey = priKey
 yopRequest.AddParam("paramName", "paramValue")
-yopResp, err := DefaultClient.Request(*yopRequest)
+yopResp, err := DefaultClient.Request(yopRequest)
 ```
 Post Json请求
 ```go
 
 var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.BuildYopRequest()
+var yopRequest = &request.YopRequest{}
 yopRequest.AppId = "appId"
 yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
 yopRequest.HttpMethod = constants.POST_HTTP_METHOD
 yopRequest.IsvPriKey = priKey
 // 设置json请求报文
 yopRequest.Content = "{\"merchantId\":\"1595815987915711\",\"requestId\":\"requestId\"}"
-yopResp, err := DefaultClient.Request(*yopRequest)
+yopResp, err := DefaultClient.Request(yopRequest)
 ```
 
 文件上传请求
 ```go
 
 var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.BuildYopRequest()
+var yopRequest = &request.YopRequest{}
 yopRequest.AppId = "appId"
 yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
 yopRequest.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
 yopRequest.HttpMethod = constants.POST_HTTP_METHOD
 yopRequest.IsvPriKey = priKey
 result.AddFile("file", f)
-yopResp, err := DefaultClient.Request(*yopRequest)
+yopResp, err := DefaultClient.Request(yopRequest)
 ```
 
 文件下载请求
 ```go
 
 var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.BuildYopRequest()
+var yopRequest = &request.YopRequest{}
 yopRequest.AppId = "appId"
 yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
 yopRequest.HttpMethod = constants.GET_HTTP_METHOD
 yopRequest.IsvPriKey = priKey
 yopRequest.AddParam("paramName", "paramValue")
-yopResp, err := DefaultClient.Request(*yopRequest)
+yopResp, err := DefaultClient.Request(yopRequest)
 ```

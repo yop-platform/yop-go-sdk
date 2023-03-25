@@ -12,14 +12,13 @@ import (
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
 	"github.com/yop-platform/yop-go-sdk/yop/utils"
-	log2 "log"
+	"log"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 )
 
-var log = log2.Default()
 var FormatISOTime = "2006-01-02T15:04:05Z"
 var DEFAULT_HEADERS_TO_SIGN []string = []string{constants.YOP_APPKEY_HEADER_KEY, constants.YOP_REQUEST_ID, constants.YOP_CONTENT_SHA256}
 

@@ -14,22 +14,27 @@ import (
 )
 
 func TestYopClient_GET_Request(t *testing.T) {
-	yopResp, err := DefaultClient.Request(*buildGetYopRequest())
+	yopResp, err := DefaultClient.Request(buildGetYopRequest())
 	testAssert(yopResp, err, t)
 }
 
 func TestYopClient_Post_Json_Request(t *testing.T) {
-	yopResp, err := DefaultClient.Request(*buildJsonYopRequest())
+	yopResp, err := DefaultClient.Request(buildJsonYopRequest())
 	testAssert(yopResp, err, t)
 }
 
 func TestYopClient_Post_From_Request(t *testing.T) {
-	yopResp, err := DefaultClient.Request(*buildPostFormYopRequest())
+	yopResp, err := DefaultClient.Request(buildPostFormYopRequest())
 	testAssert(yopResp, err, t)
 }
 
 func TestYopClient_Upload(t *testing.T) {
-	yopResp, err := DefaultClient.Request(*buildUploadYopRequest())
+	yopResp, err := DefaultClient.Request(buildUploadYopRequest())
+	testAssert(yopResp, err, t)
+}
+
+func TestYopClient_Download_Request(t *testing.T) {
+	yopResp, err := DefaultClient.Request(buildDownloadYopRequest())
 	testAssert(yopResp, err, t)
 }
 
@@ -46,9 +51,9 @@ var (
 )
 
 func buildGetYopRequest() *request.YopRequest {
-	var priKey = &request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
-	var yopRequest = request.BuildYopRequest()
-	var platformPub = &request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
+	var priKey = request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
+	var yopRequest = &request.YopRequest{}
+	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	yopRequest.PlatformPubKey = platformPub
 	yopRequest.AppId = "app_15958159879157110001"
 	yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
@@ -60,9 +65,9 @@ func buildGetYopRequest() *request.YopRequest {
 }
 
 func buildJsonYopRequest() *request.YopRequest {
-	var priKey = &request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
-	var result = request.BuildYopRequest()
-	var platformPub = &request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
+	var priKey = request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
+	var result = &request.YopRequest{}
+	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	result.PlatformPubKey = platformPub
 	result.AppId = "app_15958159879157110001"
 	result.ApiUri = "/rest/v1.0/kj/transferdomestic/singlequery"
@@ -74,9 +79,9 @@ func buildJsonYopRequest() *request.YopRequest {
 }
 
 func buildPostFormYopRequest() *request.YopRequest {
-	var priKey = &request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
-	var result = request.BuildYopRequest()
-	var platformPub = &request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
+	var priKey = request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
+	var result = &request.YopRequest{}
+	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	result.PlatformPubKey = platformPub
 	result.AppId = "app_15958159879157110001"
 	result.ApiUri = "/rest/v1.0/wym/test/notify"
@@ -88,9 +93,9 @@ func buildPostFormYopRequest() *request.YopRequest {
 }
 
 func buildUploadYopRequest() *request.YopRequest {
-	var priKey = &request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
-	var result = request.BuildYopRequest()
-	var platformPub = &request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
+	var priKey = request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
+	var result = &request.YopRequest{}
+	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	result.PlatformPubKey = platformPub
 	result.AppId = "app_15958159879157110001"
 	result.ApiUri = "/yos/v1.0/test/upload"
@@ -101,5 +106,19 @@ func buildUploadYopRequest() *request.YopRequest {
 	f, _ := os.Open(path)
 	result.AddFile("file", f)
 	result.AddParam("string", "ppp")
+	return result
+}
+
+func buildDownloadYopRequest() *request.YopRequest {
+	var priKey = request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
+	var result = &request.YopRequest{}
+	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
+	result.PlatformPubKey = platformPub
+	result.AppId = "app_15958159879157110001"
+	result.ApiUri = "/yos/v1.0/test/test/ceph-download"
+	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
+	result.HttpMethod = constants.GET_HTTP_METHOD
+	result.IsvPriKey = priKey
+	result.AddParam("fileName", "wym-test.txt")
 	return result
 }

@@ -15,7 +15,8 @@ type YopResponse struct {
 	Metadata *YopResponseMetadata
 	Result   any
 	// http请求收到的原始响应体
-	Content string
+	// 若接口类型为文件下载，则该值为文件内容
+	Content []byte
 }
 
 type YopResponseMetadata struct {
