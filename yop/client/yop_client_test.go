@@ -9,6 +9,7 @@ import (
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
 	"github.com/yop-platform/yop-go-sdk/yop/response"
+	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"os"
 	"testing"
 )
@@ -61,6 +62,8 @@ func buildGetYopRequest() *request.YopRequest {
 	yopRequest.HttpMethod = constants.GET_HTTP_METHOD
 	yopRequest.IsvPriKey = priKey
 	yopRequest.AddParam("string0", "le1")
+	yopRequest.AddParam("p2", 4)
+	yopRequest.AddParam("p3", "")
 	return yopRequest
 }
 
@@ -74,7 +77,10 @@ func buildJsonYopRequest() *request.YopRequest {
 	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
 	result.HttpMethod = constants.POST_HTTP_METHOD
 	result.IsvPriKey = priKey
-	result.Content = "{\"merchantId\":\"1595815987915711\",\"requestId\":\"requestId\"}"
+	var params = map[string]any{}
+	params["merchantId"] = "1595815987915711"
+	params["requestId"] = "requestId"
+	result.Content = utils.ParseToJsonStr(params)
 	return result
 }
 

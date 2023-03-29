@@ -54,6 +54,9 @@ func (request *YopRequest) AddParam(name string, value any) {
 }
 
 func (request *YopRequest) AddFile(name string, f *os.File) {
+	if nil == request.Files {
+		request.Files = map[string]*os.File{}
+	}
 	request.Files[name] = f
 }
 

@@ -67,7 +67,7 @@ func (yopErrorResponseAnalyzer *YopErrorResponseAnalyzer) Analyze(context RespHa
 		return nil
 	}
 	var yopServiceError = YopServiceError{}
-	json.Unmarshal([]byte(context.YopResponse.Content), &yopServiceError)
+	json.Unmarshal(context.YopResponse.Content, &yopServiceError)
 	if 0 < len(yopServiceError.Message) {
 		return &yopServiceError
 	}
