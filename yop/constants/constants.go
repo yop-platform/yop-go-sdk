@@ -22,7 +22,7 @@ const (
 	YOP_HASH_CRC64ECMA            = "x-yop-hash-crc64ecma"
 
 	YOP_HTTP_CONTENT_TYPE_JSON           = "application/json"
-	YOP_HTTP_CONTENT_TYPE_FORM           = "application/x-www-form-urlencoded"
+	YOP_HTTP_CONTENT_TYPE_FORM           = "application/x-www-form-urlencoded;charset=utf-8"
 	YOP_HTTP_CONTENT_TYPE_MULTIPART_FORM = "multipart/form-data"
 	YOP_HTTP_CONTENT_TYPE_STREAM         = "application/octet-stream"
 	YOP_HTTP_CONTENT_TYPE_TEXT           = "text/plain;charset=UTF-8"

@@ -64,6 +64,7 @@ func buildGetYopRequest() *request.YopRequest {
 	yopRequest.AddParam("string0", "le1")
 	yopRequest.AddParam("p2", 4)
 	yopRequest.AddParam("p3", "")
+	yopRequest.AddParam("p4", "中文")
 	return yopRequest
 }
 
@@ -80,6 +81,7 @@ func buildJsonYopRequest() *request.YopRequest {
 	var params = map[string]any{}
 	params["merchantId"] = "1595815987915711"
 	params["requestId"] = "requestId"
+	params["test"] = "中文"
 	result.Content = utils.ParseToJsonStr(params)
 	return result
 }
@@ -94,7 +96,10 @@ func buildPostFormYopRequest() *request.YopRequest {
 	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
 	result.HttpMethod = constants.POST_HTTP_METHOD
 	result.IsvPriKey = priKey
-	result.AddParam("string", "testString")
+	result.AddParam("goodsName", "中文")
+	result.AddParam("userId", "gggh")
+	result.AddParam("merchantNo", "OOi")
+	result.AddParam("scene", "OFFLINE")
 	return result
 }
 
