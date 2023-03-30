@@ -85,10 +85,10 @@ func (request *YopRequest) HandleServerRoot() {
 		return
 	}
 
-	if 0 == len(request.ApiUri) || !strings.HasPrefix(request.ApiUri, "/yos") {
-		request.ServerRoot = SERVER_ROOT
+	if 0 != len(request.ApiUri) || strings.HasPrefix(request.ApiUri, "/yos") {
+		request.ServerRoot = YOS_SERVER_ROOT
 	}
-	request.ServerRoot = YOS_SERVER_ROOT
+	request.ServerRoot = SERVER_ROOT
 
 }
 
