@@ -32,7 +32,7 @@ if nil != err{
 Post Form请求
 ```go
 
-var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
 var yopRequest = &request.YopRequest{}
 yopRequest.AppId = "appId"
 yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
@@ -47,7 +47,7 @@ if nil != err{
 ```
 Post Json请求
 ```go
-  var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+  var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
   var yopRequest = &request.YopRequest{}
   yopRequest.AppId = "appId"
   yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
@@ -68,7 +68,7 @@ if nil != err{
 文件上传请求
 ```go
 
-var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
 var yopRequest = &request.YopRequest{}
 yopRequest.AppId = "appId"
 yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
@@ -84,7 +84,7 @@ if nil != err{
 ```
 文件下载请求
 ```go
-  var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+  var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
   var yopRequest = &request.YopRequest{}
   yopRequest.AppId = "appId"
   yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
