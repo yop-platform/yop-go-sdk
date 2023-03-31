@@ -24,6 +24,10 @@ yopRequest.HttpMethod = constants.GET_HTTP_METHOD
 yopRequest.IsvPriKey = priKey
 yopRequest.AddParam("paramName", "paramValue")
 yopResp, err := client.DefaultClient.Request(yopRequest)
+if nil != err{
+	// request failed
+}
+//yopResp.Result为请求结果
 ```
 Post Form请求
 ```go
@@ -36,6 +40,10 @@ yopRequest.HttpMethod = constants.POST_HTTP_METHOD
 yopRequest.IsvPriKey = priKey
 yopRequest.AddParam("paramName", "paramValue")
 yopResp, err := client.DefaultClient.Request(yopRequest)
+if nil != err{ 
+	// request failed
+}
+//yopResp.Result为请求结果
 ```
 Post Json请求
 ```go
@@ -50,7 +58,12 @@ Post Json请求
   params["merchantId"] = "1595815987915711"
   params["requestId"] = "requestId"
   result.Content = utils.ParseToJsonStr(params)
+  
   yopResp, err := client.DefaultClient.Request(yopRequest)
+if nil != err{ 
+	// request failed
+}
+  //yopResp.Result为请求结果
 ```
 文件上传请求
 ```go
@@ -64,6 +77,10 @@ yopRequest.HttpMethod = constants.POST_HTTP_METHOD
 yopRequest.IsvPriKey = priKey
 result.AddFile("file", f)
 yopResp, err := client.DefaultClient.Request(yopRequest)
+if nil != err{ 
+	// request failed
+}
+// yopResp.Result为上传请求结果
 ```
 文件下载请求
 ```go
@@ -75,6 +92,10 @@ yopResp, err := client.DefaultClient.Request(yopRequest)
   yopRequest.IsvPriKey = priKey
   yopRequest.AddParam("paramName", "paramValue")
   yopResp, err := client.DefaultClient.Request(yopRequest)
+if nil != err{ 
+	// request failed
+}
+  // yopResp.Content为文件内容
 ```
 解密回调内容
 ```go
