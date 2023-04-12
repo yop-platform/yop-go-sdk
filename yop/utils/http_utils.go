@@ -13,11 +13,19 @@ import (
 )
 
 func NormalizePath(path string) string {
+
 	return strings.ReplaceAll(Normalize(path), "%2F", "/")
 }
 
 func Normalize(value string) string {
-	return url.QueryEscape(value)
+	var firstEncodeStr = url.QueryEscape(value)
+	return encodeSpecialChar(firstEncodeStr)
+}
+
+func encodeSpecialChar(str string) string {
+	// 空格
+	str = strings.ReplaceAll(str, "+", "%20")
+	return str
 }
 
 func EncodeParameters(params map[string][]string) string {
