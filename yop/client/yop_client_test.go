@@ -96,10 +96,13 @@ func buildPostFormYopRequest() *request.YopRequest {
 	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
 	result.HttpMethod = constants.POST_HTTP_METHOD
 	result.IsvPriKey = priKey
-	result.AddParam("goodsName", "中文")
-	result.AddParam("userId", "gggh")
-	result.AddParam("merchantNo", "OOi")
-	result.AddParam("scene", "OFFLINE")
+	result.AddParam("orderId", "123435234513")
+	result.AddParam("channel", "WECHAT")
+	result.AddParam("expiredTime", "2023-04-12 19:00:51")
+	result.AddParam("scene", "ONLINE")
+	result.AddParam("fundProcessType", "DELAY_SETTLE")
+	result.AddParam("orderAmount", "0.01")
+	result.AddParam("appId", "wx217c7f04b90800f4，")
 	return result
 }
 

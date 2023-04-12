@@ -13,6 +13,7 @@ import (
 	"github.com/yop-platform/yop-go-sdk/yop/request"
 	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"log"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -54,8 +55,8 @@ func (signer *RsaSigner) SignRequest(yopRequest request.YopRequest) {
 }
 
 func (signer *RsaSigner) VerifyResponse(content string, signature string, pubKey request.PlatformPubKey) bool {
-	content = strings.ReplaceAll(content, "\n", "")
-	content = strings.ReplaceAll(content, " ", "")
+	re := regexp.MustCompile("[ \t\n]")
+	content = re.ReplaceAllString(content, "")
 	return utils.VerifySign(content, signature, pubKey.Value, crypto.SHA256)
 }
 
