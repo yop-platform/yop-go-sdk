@@ -26,7 +26,6 @@ func DecryptCallback(platformPubKey string, isvPriKey string, callBack string) (
 		return "", err
 	}
 	cipherBytes := base64Decode(cipherText[1])
-	log.Println(cipherBytes)
 	body := string(AesDecryptECB(cipherBytes, randomKey))
 	dollarPosition := strings.LastIndex(body, "$")
 	signature := strings.TrimSpace(body[dollarPosition+1:])
