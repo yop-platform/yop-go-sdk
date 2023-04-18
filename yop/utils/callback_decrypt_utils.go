@@ -25,8 +25,8 @@ func DecryptCallback(platformPubKey string, isvPriKey string, callBack string) (
 		log.Println("random key rsa error ", err)
 		return "", err
 	}
-
-	cipherBytes, _ := base64.URLEncoding.DecodeString(cipherText[1])
+	cipherBytes := base64Decode(cipherText[1])
+	log.Println(cipherBytes)
 	body := string(AesDecryptECB(cipherBytes, randomKey))
 	dollarPosition := strings.LastIndex(body, "$")
 	signature := strings.TrimSpace(body[dollarPosition+1:])
@@ -36,6 +36,19 @@ func DecryptCallback(platformPubKey string, isvPriKey string, callBack string) (
 		return "", errors.New("rsa sign verify fail")
 	}
 	return body, nil
+}
+
+// 解析非标 base64_encode
+func base64Decode(b string) []byte {
+	b = strings.Replace(b, "-", "+", -1)
+	b = strings.Replace(b, "_", "/", -1)
+	r, err := base64.RawStdEncoding.DecodeString(b)
+	if err != nil {
+		log.Println("base64 decode error ", err)
+		return nil
+	}
+
+	return r
 }
 func AesDecryptECB(encrypted []byte, key []byte) (decrypted []byte) {
 	cipher, _ := aes.NewCipher(generateKey(key))
