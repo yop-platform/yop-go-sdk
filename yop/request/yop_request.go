@@ -8,13 +8,14 @@ package request
 import (
 	"encoding/json"
 	"fmt"
-	uuid "github.com/satori/go.uuid"
 	"html/template"
 	"log"
 	"os"
 	"reflect"
 	"strconv"
 	"strings"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 const (
@@ -149,7 +150,7 @@ func ToStringE(i any) string {
 	case error:
 		return s.Error()
 	default:
-		log.Fatal(fmt.Sprintf("unable to cast %#v of type %T to string", i, i))
+		log.Fatalf("unable to cast %#v of type %T to string", i, i)
 		return ""
 	}
 }

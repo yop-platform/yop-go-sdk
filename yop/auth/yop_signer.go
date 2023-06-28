@@ -9,15 +9,16 @@ import (
 	"crypto"
 	"crypto/sha256"
 	"fmt"
-	"github.com/yop-platform/yop-go-sdk/yop/constants"
-	"github.com/yop-platform/yop-go-sdk/yop/request"
-	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"log"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/yop-platform/yop-go-sdk/yop/constants"
+	"github.com/yop-platform/yop-go-sdk/yop/request"
+	"github.com/yop-platform/yop-go-sdk/yop/utils"
 )
 
 var FormatISOTime = "2006-01-02T15:04:05Z"
@@ -61,7 +62,7 @@ func (signer *RsaSigner) VerifyResponse(content string, signature string, pubKey
 }
 
 func calculateContentHash(yopRequest request.YopRequest) string {
-	var encodedParameters = ""
+	var encodedParameters string
 	if utils.UsePayloadForQueryParameters(yopRequest) {
 		encodedParameters = utils.GetCanonicalQueryString(yopRequest.Params)
 	} else {

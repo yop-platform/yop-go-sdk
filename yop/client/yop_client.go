@@ -95,7 +95,10 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 
 		for k, v := range yopRequest.Params {
 			for i := range v {
-				bodyWriter.WriteField(k, v[i])
+				err = bodyWriter.WriteField(k, v[i])
+				if err != nil {
+					return http.Request{}, err
+				}
 			}
 		}
 
@@ -104,7 +107,10 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 			if err != nil {
 				return http.Request{}, err
 			}
-			io.Copy(fileWriter, v)
+			_, err = io.Copy(fileWriter, v)
+			if err != nil {
+				return http.Request{}, err
+			}
 		}
 		bodyWriter.Close()
 
