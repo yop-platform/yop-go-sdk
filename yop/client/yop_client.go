@@ -8,12 +8,6 @@ package client
 import (
 	"bytes"
 	"errors"
-	uuid "github.com/satori/go.uuid"
-	"github.com/yop-platform/yop-go-sdk/yop/auth"
-	"github.com/yop-platform/yop-go-sdk/yop/constants"
-	"github.com/yop-platform/yop-go-sdk/yop/request"
-	"github.com/yop-platform/yop-go-sdk/yop/response"
-	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"io"
 	"io/ioutil"
 	"log"
@@ -22,6 +16,13 @@ import (
 	"net/url"
 	"runtime"
 	"strings"
+
+	uuid "github.com/satori/go.uuid"
+	"github.com/yop-platform/yop-go-sdk/yop/auth"
+	"github.com/yop-platform/yop-go-sdk/yop/constants"
+	"github.com/yop-platform/yop-go-sdk/yop/request"
+	"github.com/yop-platform/yop-go-sdk/yop/response"
+	"github.com/yop-platform/yop-go-sdk/yop/utils"
 )
 
 var DefaultClient = YopClient{&http.Client{Transport: http.DefaultTransport}}
@@ -40,9 +41,14 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 	if nil != err {
 		return nil, err
 	}
-	httpResp, _ := yopClient.Client.Do(&httpRequest)
-
-	body, _ := ioutil.ReadAll(httpResp.Body)
+	httpResp, err := yopClient.Client.Do(&httpRequest)
+	if err != nil {
+		return nil, err
+	}
+	body, err := ioutil.ReadAll(httpResp.Body)
+	if err != nil {
+		return nil, err
+	}
 	var yopResponse = response.YopResponse{Content: body}
 	context := response.RespHandleContext{YopSigner: &signer, YopResponse: &yopResponse, YopRequest: *request}
 	for i := range response.ANALYZER_CHAIN {
@@ -94,7 +100,10 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 		}
 
 		for k, v := range yopRequest.Files {
-			fileWriter, _ := bodyWriter.CreateFormFile(k, v.Name())
+			fileWriter, err := bodyWriter.CreateFormFile(k, v.Name())
+			if err != nil {
+				return http.Request{}, err
+			}
 			io.Copy(fileWriter, v)
 		}
 		bodyWriter.Close()

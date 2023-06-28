@@ -6,12 +6,13 @@
 package client
 
 import (
+	"os"
+	"testing"
+
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
 	"github.com/yop-platform/yop-go-sdk/yop/response"
 	"github.com/yop-platform/yop-go-sdk/yop/utils"
-	"os"
-	"testing"
 )
 
 func TestYopClient_GET_Request(t *testing.T) {
@@ -116,7 +117,7 @@ func buildUploadYopRequest() *request.YopRequest {
 	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
 	result.HttpMethod = constants.POST_HTTP_METHOD
 	result.IsvPriKey = priKey
-	var path = "/Users/yp-21024/go/src/yop-go-sdk/README.md"
+	var path = "../../README.md"
 	f, _ := os.Open(path)
 	result.AddFile("file", f)
 	result.AddParam("string", "ppp")
