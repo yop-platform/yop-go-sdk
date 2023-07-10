@@ -40,9 +40,14 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 	if nil != err {
 		return nil, err
 	}
-	httpResp, _ := yopClient.Client.Do(&httpRequest)
-
-	body, _ := ioutil.ReadAll(httpResp.Body)
+	httpResp, err := yopClient.Client.Do(&httpRequest)
+	if nil != err {
+		return nil, err
+	}
+	body, err := ioutil.ReadAll(httpResp.Body)
+	if nil != err {
+		return nil, err
+	}
 	var yopResponse = response.YopResponse{Content: body}
 	context := response.RespHandleContext{YopSigner: &signer, YopResponse: &yopResponse, YopRequest: *request}
 	for i := range response.ANALYZER_CHAIN {
