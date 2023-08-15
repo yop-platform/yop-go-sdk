@@ -8,7 +8,7 @@ package client
 import (
 	"bytes"
 	"errors"
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/yop-platform/yop-go-sdk/yop/auth"
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
@@ -59,7 +59,7 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 	return &yopResponse, nil
 }
 func initRequest(yopRequest *request.YopRequest) {
-	yopRequest.RequestId = uuid.NewV4().String()
+	yopRequest.RequestId = uuid.Must(uuid.NewV4()).String()
 	log.Println("requestId:" + yopRequest.RequestId)
 	if 0 == len(yopRequest.ServerRoot) {
 		yopRequest.HandleServerRoot()
