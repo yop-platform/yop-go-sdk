@@ -13,14 +13,13 @@ Yeepay openapi SDK fo Go
 "github.com/yop-platform/yop-go-sdk/yop/utils"
 ```
 2.调用接口</br>
+放在最前面：请求超时时间通过YopRequest.Timeout设置，默认值为10秒<br><br>
 Get请求
 ```go
 
 var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = &request.YopRequest{}
+var yopRequest = request.NewYopRequest(constants.GET_HTTP_METHOD,"/rest/v1.0/test-wdc/product-query/query-for-doc")
 yopRequest.AppId = "appId"
-yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
-yopRequest.HttpMethod = constants.GET_HTTP_METHOD
 yopRequest.IsvPriKey = priKey
 yopRequest.AddParam("paramName", "paramValue")
 yopResp, err := client.DefaultClient.Request(yopRequest)
@@ -33,10 +32,8 @@ Post Form请求
 ```go
 
 var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = &request.YopRequest{}
+var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test-wdc/product-query/query-for-doc")
 yopRequest.AppId = "appId"
-yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
-yopRequest.HttpMethod = constants.POST_HTTP_METHOD
 yopRequest.IsvPriKey = priKey
 yopRequest.AddParam("paramName", "paramValue")
 yopResp, err := client.DefaultClient.Request(yopRequest)
@@ -48,10 +45,8 @@ if nil != err{
 Post Json请求
 ```go
   var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-  var yopRequest = &request.YopRequest{}
+  var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD,"/rest/v1.0/test-wdc/product-query/query-for-doc")
   yopRequest.AppId = "appId"
-  yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
-  yopRequest.HttpMethod = constants.POST_HTTP_METHOD
   yopRequest.IsvPriKey = priKey
   // 设置json请求报文
   var params = map[string]any{}
@@ -69,11 +64,8 @@ if nil != err{
 ```go
 
 var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = &request.YopRequest{}
+var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD,"/rest/v1.0/test-wdc/product-query/query-for-doc")
 yopRequest.AppId = "appId"
-yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
-yopRequest.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
-yopRequest.HttpMethod = constants.POST_HTTP_METHOD
 yopRequest.IsvPriKey = priKey
 result.AddFile("file", f)
 yopResp, err := client.DefaultClient.Request(yopRequest)
@@ -85,10 +77,8 @@ if nil != err{
 文件下载请求
 ```go
   var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-  var yopRequest = &request.YopRequest{}
+  var yopRequest = request.NewYopRequest(constants.GET_HTTP_METHOD,"/rest/v1.0/test-wdc/product-query/query-for-doc")
   yopRequest.AppId = "appId"
-  yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
-  yopRequest.HttpMethod = constants.GET_HTTP_METHOD
   yopRequest.IsvPriKey = priKey
   yopRequest.AddParam("paramName", "paramValue")
   yopResp, err := client.DefaultClient.Request(yopRequest)

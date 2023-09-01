@@ -7,6 +7,7 @@ package client
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	uuid "github.com/satori/go.uuid"
 	"github.com/yop-platform/yop-go-sdk/yop/auth"
@@ -78,10 +79,13 @@ func addStandardHeaders(yopRequest *request.YopRequest) {
 }
 
 func buildUserAgent() string {
-	return "go" + "/" + "4.3.0" + "/" + runtime.GOOS + "/" + runtime.Version() + runtime.GOROOT()
+	return "go" + "/" + constants.SDK_VERSION + "/" + runtime.GOOS + "/" + runtime.Version() + runtime.GOROOT()
 }
 
 func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
+	ctx, _ := context.WithTimeout(context.Background(), yopRequest.Timeout)
+	//defer cancel()
+
 	var uri = yopRequest.ServerRoot + yopRequest.ApiUri
 	isMultiPart, err := checkForMultiPart(yopRequest)
 	if nil != err {
@@ -107,7 +111,7 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 		if err != nil {
 			return http.Request{}, err
 		}
-		req, err := http.NewRequest("POST", uri, bodyBuf)
+		req, err := http.NewRequestWithContext(ctx, "POST", uri, bodyBuf)
 		if nil != err {
 			return http.Request{}, err
 		}
@@ -136,7 +140,7 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 				body = bytes.NewBuffer([]byte(formDataStr))
 			}
 		}
-		httpRequest, err := http.NewRequest(yopRequest.HttpMethod, uri, body)
+		httpRequest, err := http.NewRequestWithContext(ctx, yopRequest.HttpMethod, uri, body)
 		if err != nil {
 			return http.Request{}, err
 		}

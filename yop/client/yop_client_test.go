@@ -12,6 +12,7 @@ import (
 	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"os"
 	"testing"
+	"time"
 )
 
 func TestYopClient_GET_Request(t *testing.T) {
@@ -53,30 +54,28 @@ var (
 
 func buildGetYopRequest() *request.YopRequest {
 	var priKey = request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
-	var yopRequest = &request.YopRequest{}
+	var yopRequest = request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test-wdc/product-query/query-for-doc")
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	yopRequest.PlatformPubKey = platformPub
 	yopRequest.AppId = "app_15958159879157110001"
-	yopRequest.ApiUri = "/rest/v1.0/test-wdc/product-query/query-for-doc"
 	yopRequest.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
-	yopRequest.HttpMethod = constants.GET_HTTP_METHOD
 	yopRequest.IsvPriKey = priKey
 	yopRequest.AddParam("string0", "le1")
 	yopRequest.AddParam("p2", 4)
 	yopRequest.AddParam("p3", "")
 	yopRequest.AddParam("p4", "中文")
+	// 设置超时时间
+	yopRequest.Timeout = 10 * time.Second
 	return yopRequest
 }
 
 func buildJsonYopRequest() *request.YopRequest {
 	var priKey = request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
-	var result = &request.YopRequest{}
+	var result = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/kj/transferdomestic/singlequery")
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	result.PlatformPubKey = platformPub
 	result.AppId = "app_15958159879157110001"
-	result.ApiUri = "/rest/v1.0/kj/transferdomestic/singlequery"
 	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
-	result.HttpMethod = constants.POST_HTTP_METHOD
 	result.IsvPriKey = priKey
 	var params = map[string]any{}
 	params["merchantId"] = "1595815987915711"
@@ -88,15 +87,13 @@ func buildJsonYopRequest() *request.YopRequest {
 
 func buildPostFormYopRequest() *request.YopRequest {
 	var priKey = request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
-	var result = &request.YopRequest{}
+	var result = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/wym/test/notify")
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	result.PlatformPubKey = platformPub
 	result.AppId = "app_15958159879157110001"
-	result.ApiUri = "/rest/v1.0/wym/test/notify"
 	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
-	result.HttpMethod = constants.POST_HTTP_METHOD
 	result.IsvPriKey = priKey
-	result.AddParam("orderId", "123435234513")
+	result.AddParam("orderId", "123435234513%")
 	result.AddParam("channel", "WECHAT")
 	result.AddParam("expiredTime", "2023-04-12 19:00:51")
 	result.AddParam("scene", "ONLINE")
@@ -108,13 +105,11 @@ func buildPostFormYopRequest() *request.YopRequest {
 
 func buildUploadYopRequest() *request.YopRequest {
 	var priKey = request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
-	var result = &request.YopRequest{}
+	var result = request.NewYopRequest(constants.POST_HTTP_METHOD, "app_15958159879157110001")
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	result.PlatformPubKey = platformPub
 	result.AppId = "app_15958159879157110001"
-	result.ApiUri = "/yos/v1.0/test/upload"
 	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
-	result.HttpMethod = constants.POST_HTTP_METHOD
 	result.IsvPriKey = priKey
 	var path = "/Users/yp-21024/go/src/yop-go-sdk/README.md"
 	f, _ := os.Open(path)
@@ -125,13 +120,11 @@ func buildUploadYopRequest() *request.YopRequest {
 
 func buildDownloadYopRequest() *request.YopRequest {
 	var priKey = request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
-	var result = &request.YopRequest{}
+	var result = request.NewYopRequest(constants.GET_HTTP_METHOD, "/yos/v1.0/test/test/ceph-download")
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	result.PlatformPubKey = platformPub
 	result.AppId = "app_15958159879157110001"
-	result.ApiUri = "/yos/v1.0/test/test/ceph-download"
 	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
-	result.HttpMethod = constants.GET_HTTP_METHOD
 	result.IsvPriKey = priKey
 	result.AddParam("fileName", "wym-test.txt")
 	return result

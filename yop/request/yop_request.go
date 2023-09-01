@@ -15,6 +15,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -42,6 +43,14 @@ type YopRequest struct {
 	Headers map[string]string
 	// 文件
 	Files map[string]*os.File
+
+	// 超时时间
+	Timeout time.Duration
+}
+
+// NewYopRequest 创建请求
+func NewYopRequest(httpMethod string, apiUri string) *YopRequest {
+	return &YopRequest{HttpMethod: httpMethod, ApiUri: apiUri, Timeout: 10 * time.Second}
 }
 
 func (request *YopRequest) AddParam(name string, value any) {
