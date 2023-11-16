@@ -50,6 +50,10 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 		return nil, err
 	}
 	var yopResponse = response.YopResponse{Content: body}
+	metaData := response.YopResponseMetadata{}
+	metaData.YopSign = httpResp.Header.Get("X-Yop-Sign")
+	metaData.YopRequestId = httpResp.Header.Get("X-Yop-Request-Id")
+	yopResponse.Metadata = &metaData
 	context := response.RespHandleContext{YopSigner: &signer, YopResponse: &yopResponse, YopRequest: *request}
 	for i := range response.ANALYZER_CHAIN {
 		err = response.ANALYZER_CHAIN[i].Analyze(context, httpResp)
