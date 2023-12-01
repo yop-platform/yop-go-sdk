@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"runtime"
 	"strings"
+	"time"
 )
 
 var DefaultClient = YopClient{&http.Client{Transport: http.DefaultTransport}}
@@ -87,6 +88,9 @@ func buildUserAgent() string {
 }
 
 func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
+	if yopRequest.Timeout == 0 {
+		yopRequest.Timeout = 10 * time.Second
+	}
 	ctx, _ := context.WithTimeout(context.Background(), yopRequest.Timeout)
 	//defer cancel()
 
