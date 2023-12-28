@@ -106,7 +106,7 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 
 		for k, v := range yopRequest.Params {
 			for i := range v {
-				bodyWriter.WriteField(k, v[i])
+				bodyWriter.WriteField(k, url.QueryEscape(v[i]))
 			}
 		}
 
@@ -141,7 +141,7 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 				formValues := url.Values{}
 				for k, v := range yopRequest.Params {
 					for i := range v {
-						formValues.Set(k, v[i])
+						formValues.Set(k, url.QueryEscape(v[i]))
 					}
 				}
 				formDataStr := formValues.Encode()
