@@ -8,6 +8,7 @@ package client
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	uuid "github.com/satori/go.uuid"
 	"github.com/yop-platform/yop-go-sdk/yop/auth"
@@ -55,6 +56,9 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 	metaData.YopSign = httpResp.Header.Get("X-Yop-Sign")
 	metaData.YopRequestId = httpResp.Header.Get("X-Yop-Request-Id")
 	yopResponse.Metadata = &metaData
+	var yopResult = response.YopResult{}
+	json.Unmarshal(body, &yopResult)
+	yopResponse.Result = yopResult
 	context := response.RespHandleContext{YopSigner: &signer, YopResponse: &yopResponse, YopRequest: *request}
 	for i := range response.ANALYZER_CHAIN {
 		err = response.ANALYZER_CHAIN[i].Analyze(context, httpResp)

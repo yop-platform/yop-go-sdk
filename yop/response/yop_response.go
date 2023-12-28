@@ -13,7 +13,7 @@ import (
 
 type YopResponse struct {
 	Metadata *YopResponseMetadata
-	Result   any
+	Result   YopResult
 	// http请求收到的原始响应体
 	// 若接口类型为文件下载，则该值为文件内容
 	Content []byte
@@ -34,4 +34,26 @@ type RespHandleContext struct {
 	auth.YopSigner
 	*YopResponse
 	request.YopRequest
+}
+
+type YopResult struct {
+	// 业务处理状态
+	State string `json:"state"`
+	// 业务响应结果
+	Result any `json:"result"`
+	// 错误信息
+	Error YopError `json:"error"`
+	// 时间戳
+	TS int64 `json:"ts"`
+	// 签名
+	Sign string `json:"sign"`
+}
+
+type YopError struct {
+	// 错误码
+	Code string `json:"code"`
+	// 错误信息
+	Message string `json:"message"`
+	// 请求标识
+	Solution string `json:"solution"`
 }

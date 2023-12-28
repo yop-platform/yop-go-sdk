@@ -48,9 +48,14 @@ type YopSignatureCheckAnalyzer struct {
 }
 
 func (yopSignatureCheckAnalyzer *YopSignatureCheckAnalyzer) Analyze(context RespHandleContext, httpResponse *http.Response) error {
-	var signature = context.YopResponse.Metadata.YopSign
+	signature := context.YopResponse.Result.Sign
+
 	if 0 < len(signature) {
-		if !context.YopSigner.VerifyResponse(string(context.YopResponse.Content), signature, context.YopRequest.PlatformPubKey) {
+		b, err := json.Marshal(context.YopResponse.Result.Result)
+		if nil != err {
+			return errors.New("unexpected error")
+		}
+		if !context.YopSigner.VerifyResponse(string(b), signature, context.YopRequest.PlatformPubKey) {
 			return errors.New("response sign verify failure")
 		}
 	}
