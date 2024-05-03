@@ -84,7 +84,7 @@ func addStandardHeaders(yopRequest *request.YopRequest) {
 }
 
 func buildUserAgent() string {
-	return "go" + "/" + constants.SDK_VERSION + "/" + runtime.GOOS + "/" + runtime.Version() + runtime.GOROOT()
+	return "go" + "/" + constants.SDK_VERSION + "/" + runtime.GOOS + "/" + runtime.Version()
 }
 
 func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
