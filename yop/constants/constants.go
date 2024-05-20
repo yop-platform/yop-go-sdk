@@ -33,5 +33,5 @@ const (
 	SC_OK         = 200
 	SC_NO_CONTENT = 204
 
-	SDK_VERSION = "4.3.5"
+	SDK_VERSION = "4.3.6"
 )

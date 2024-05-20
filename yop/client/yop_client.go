@@ -46,6 +46,7 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 	if nil != err {
 		return nil, err
 	}
+	defer httpResp.Body.Close()
 	body, err := ioutil.ReadAll(httpResp.Body)
 	if nil != err {
 		return nil, err
