@@ -17,7 +17,6 @@ import (
 	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"io"
 	"io/ioutil"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -67,7 +66,7 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 }
 func initRequest(yopRequest *request.YopRequest) {
 	yopRequest.RequestId = uuid.NewV4().String()
-	log.Println("requestId:" + yopRequest.RequestId)
+	utils.Logger.Println("requestId:" + yopRequest.RequestId)
 	if 0 == len(yopRequest.ServerRoot) {
 		yopRequest.HandleServerRoot()
 	}
@@ -166,7 +165,7 @@ func checkForMultiPart(yopRequest request.YopRequest) (bool, error) {
 	var result = nil != yopRequest.Files && 0 < len(yopRequest.Files)
 	if result && 0 != strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod) {
 		var errorMsg = "ContentType:multipart/form-data only support Post Request"
-		log.Fatal(errorMsg)
+		utils.Logger.Println("error: " + errorMsg)
 		return false, errors.New(errorMsg)
 	}
 	return result, nil
