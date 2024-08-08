@@ -9,8 +9,8 @@ import (
 	"encoding/json"
 	"fmt"
 	uuid "github.com/satori/go.uuid"
+	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"html/template"
-	"log"
 	"os"
 	"reflect"
 	"strconv"
@@ -158,7 +158,7 @@ func ToStringE(i any) string {
 	case error:
 		return s.Error()
 	default:
-		log.Fatal(fmt.Sprintf("unable to cast %#v of type %T to string", i, i))
+		utils.Logger.Println(fmt.Sprintf("unable to cast %#v of type %T to string", i, i))
 		return ""
 	}
 }
