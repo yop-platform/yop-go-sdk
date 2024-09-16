@@ -28,21 +28,25 @@ func encodeSpecialChar(str string) string {
 	return str
 }
 
-func EncodeParameters(params map[string][]string) string {
+func EncodeParameters(params map[string][]string, forSign bool) string {
 	if 0 == len(params) {
 		return ""
 	}
 	var encodedNameValuePair []string
 	for k, v := range params {
 		for i := range v {
-			encodedNameValuePair = append(encodedNameValuePair, toNameValuePair(k, v[i]))
+			encodedNameValuePair = append(encodedNameValuePair, toNameValuePair(k, v[i], forSign))
 		}
 	}
 	return strings.Join(encodedNameValuePair, "&")
 }
 
-func toNameValuePair(paramName string, paramValue string) string {
-	return Normalize(paramName) + "=" + Normalize(paramValue)
+func toNameValuePair(paramName string, paramValue string, forSign bool) string {
+	val := paramValue
+	if !forSign {
+		val = Normalize(paramValue)
+	}
+	return Normalize(paramName) + "=" + Normalize(val)
 }
 
 func GetCanonicalQueryString(params map[string][]string) string {
