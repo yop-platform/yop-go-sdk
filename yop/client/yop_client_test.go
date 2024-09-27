@@ -60,10 +60,8 @@ func buildGetYopRequest() *request.YopRequest {
 	yopRequest.AppId = "app_15958159879157110001"
 	yopRequest.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
 	yopRequest.IsvPriKey = priKey
-	yopRequest.AddParam("string0", "le1")
-	yopRequest.AddParam("p2", 4)
-	yopRequest.AddParam("p3", "")
-	yopRequest.AddParam("p4", "中文")
+	yopRequest.AddParam("string0", "le1%3D%3D")
+	yopRequest.AddParam("p4", "中文%%")
 	// 设置超时时间
 	yopRequest.Timeout = 10 * time.Second
 	return yopRequest

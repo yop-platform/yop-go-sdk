@@ -127,7 +127,7 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 		req.Header.Set("Content-Type", bodyWriter.FormDataContentType())
 		result = *req
 	} else {
-		var encodedParam = utils.EncodeParameters(yopRequest.Params)
+		var encodedParam = utils.EncodeParameters(yopRequest.Params, false)
 		var requestHasPayload = 0 < len(yopRequest.Content)
 		var requestIsPost = 0 == strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod)
 		var putParamsInUri = !requestIsPost || requestHasPayload
