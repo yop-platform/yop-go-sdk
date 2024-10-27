@@ -9,12 +9,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	uuid "github.com/satori/go.uuid"
-	"github.com/yop-platform/yop-go-sdk/yop/auth"
-	"github.com/yop-platform/yop-go-sdk/yop/constants"
-	"github.com/yop-platform/yop-go-sdk/yop/request"
-	"github.com/yop-platform/yop-go-sdk/yop/response"
-	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"io"
 	"io/ioutil"
 	"log"
@@ -24,9 +18,17 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	uuid "github.com/satori/go.uuid"
+	"github.com/yop-platform/yop-go-sdk/yop/auth"
+	"github.com/yop-platform/yop-go-sdk/yop/constants"
+	"github.com/yop-platform/yop-go-sdk/yop/request"
+	"github.com/yop-platform/yop-go-sdk/yop/response"
+	"github.com/yop-platform/yop-go-sdk/yop/utils"
 )
 
 var DefaultClient = YopClient{&http.Client{Transport: http.DefaultTransport}}
+var IsLog = true
 
 type YopClient struct {
 	*http.Client
@@ -36,7 +38,10 @@ type YopClient struct {
 func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopResponse, error) {
 	initRequest(request)
 	var signer = auth.RsaSigner{}
-	signer.SignRequest(*request)
+	err := signer.SignRequest(*request)
+	if nil != err {
+		return nil, err
+	}
 
 	httpRequest, err := buildHttpRequest(*request)
 	if nil != err {
@@ -67,7 +72,9 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 }
 func initRequest(yopRequest *request.YopRequest) {
 	yopRequest.RequestId = uuid.NewV4().String()
-	log.Println("requestId:" + yopRequest.RequestId)
+	if IsLog {
+		log.Println("requestId:" + yopRequest.RequestId)
+	}
 	if 0 == len(yopRequest.ServerRoot) {
 		yopRequest.HandleServerRoot()
 	}
@@ -166,7 +173,9 @@ func checkForMultiPart(yopRequest request.YopRequest) (bool, error) {
 	var result = nil != yopRequest.Files && 0 < len(yopRequest.Files)
 	if result && 0 != strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod) {
 		var errorMsg = "ContentType:multipart/form-data only support Post Request"
-		log.Fatal(errorMsg)
+		if IsLog {
+			log.Fatal(errorMsg)
+		}
 		return false, errors.New(errorMsg)
 	}
 	return result, nil
