@@ -1,3 +1,10 @@
+/*
+ * @Author: BigRocs
+ * @Date: 2024-10-27 08:51:30
+ * @LastEditTime: 2024-10-27 08:52:23
+ * @LastEditors: BigRocs
+ * @Description: QQ: 532388887, Email:bigrocs@qq.com
+ */
 // Package auth
 // Copyright: Copyright (c) 2020<br>
 // Company: 易宝支付(YeePay)<br>
@@ -6,8 +13,9 @@
 package auth
 
 import (
-	"github.com/yop-platform/yop-go-sdk/yop/request"
 	"testing"
+
+	"github.com/yop-platform/yop-go-sdk/yop/request"
 )
 
 func TestRsaSigner_SignRequest(t *testing.T) {
@@ -25,7 +33,7 @@ func buildYopRequest() *request.YopRequest {
 	result.ApiUri = "/rest/v2.0/yop/platform/certs"
 	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
 	result.HttpMethod = "GET"
-	result.IsvPriKey = priKey
+	result.IsvPriKey = *priKey
 	result.AddParam("name", "testName")
 	result.AddParam("age", 18)
 	return result

@@ -1,3 +1,10 @@
+/*
+ * @Author: BigRocs
+ * @Date: 2024-10-27 08:51:30
+ * @LastEditTime: 2024-10-27 08:58:10
+ * @LastEditors: BigRocs
+ * @Description: QQ: 532388887, Email:bigrocs@qq.com
+ */
 // Package response
 // Copyright: Copyright (c) 2020<br>
 // Company: 易宝支付(YeePay)<br>
@@ -8,12 +15,13 @@ package response
 import (
 	"encoding/json"
 	"errors"
-	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/yop-platform/yop-go-sdk/yop/constants"
 )
 
 var ANALYZER_CHAIN = []HttpResponseAnalyzer{
@@ -22,6 +30,7 @@ var ANALYZER_CHAIN = []HttpResponseAnalyzer{
 	&YopErrorResponseAnalyzer{},
 	&YopJsonResponseAnalyzer{},
 }
+var IsLog = true
 
 type HttpResponseAnalyzer interface {
 	Analyze(context RespHandleContext, httpResponse *http.Response) error
@@ -62,7 +71,9 @@ type YopErrorResponseAnalyzer struct {
 
 func (yopErrorResponseAnalyzer *YopErrorResponseAnalyzer) Analyze(context RespHandleContext, httpResponse *http.Response) error {
 	var statusCode = httpResponse.StatusCode
-	log.Println("statusCode:" + strconv.Itoa(statusCode))
+	if IsLog {
+		log.Println("statusCode:" + strconv.Itoa(statusCode))
+	}
 	if statusCode/100 == constants.SC_OK && statusCode != constants.SC_NO_CONTENT {
 		return nil
 	}
