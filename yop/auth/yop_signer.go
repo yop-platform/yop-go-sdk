@@ -9,10 +9,10 @@ import (
 	"crypto"
 	"crypto/sha256"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
 	"github.com/yop-platform/yop-go-sdk/yop/utils"
-	"log"
 	"regexp"
 	"sort"
 	"strconv"
@@ -25,7 +25,7 @@ var DEFAULT_HEADERS_TO_SIGN []string = []string{constants.YOP_APPKEY_HEADER_KEY,
 
 type YopSigner interface {
 	// SignRequest 请求报文签名
-	SignRequest(yopRequest request.YopRequest)
+	SignRequest(yopRequest request.YopRequest) error
 
 	// VerifyResponse 响应报文验签
 	VerifyResponse(content string, signature string, pubKey request.PlatformPubKey) bool
@@ -34,7 +34,11 @@ type YopSigner interface {
 type RsaSigner struct {
 }
 
-func (signer *RsaSigner) SignRequest(yopRequest request.YopRequest) {
+func init() {
+	log.SetLevel(log.InfoLevel)
+}
+
+func (signer *RsaSigner) SignRequest(yopRequest request.YopRequest) error {
 	var authString = buildAuthString(yopRequest.AppId)
 	log.Println("authString:" + authString)
 
@@ -52,6 +56,7 @@ func (signer *RsaSigner) SignRequest(yopRequest request.YopRequest) {
 	var authorizationHeader = buildAuthzHeader(authString, signature, headerToSign)
 	log.Println("Authorization:" + authorizationHeader)
 	yopRequest.Headers[constants.AUTHORIZATION] = authorizationHeader
+	return nil
 }
 
 func (signer *RsaSigner) VerifyResponse(content string, signature string, pubKey request.PlatformPubKey) bool {

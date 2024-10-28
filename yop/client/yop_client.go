@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	uuid "github.com/satori/go.uuid"
+	log "github.com/sirupsen/logrus"
 	"github.com/yop-platform/yop-go-sdk/yop/auth"
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
@@ -17,7 +18,6 @@ import (
 	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"io"
 	"io/ioutil"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -32,11 +32,18 @@ type YopClient struct {
 	*http.Client
 }
 
+func init() {
+	log.SetLevel(log.InfoLevel)
+}
+
 // Request 普通请求
 func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopResponse, error) {
 	initRequest(request)
 	var signer = auth.RsaSigner{}
-	signer.SignRequest(*request)
+	err := signer.SignRequest(*request)
+	if nil != err {
+		return nil, err
+	}
 
 	httpRequest, err := buildHttpRequest(*request)
 	if nil != err {

@@ -8,8 +8,8 @@ package response
 import (
 	"encoding/json"
 	"errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -28,6 +28,10 @@ type HttpResponseAnalyzer interface {
 }
 
 type YopMetadataResponseAnalyzer struct {
+}
+
+func init() {
+	log.SetLevel(log.InfoLevel)
 }
 
 func (yopMetadataResponseAnalyzer *YopMetadataResponseAnalyzer) Analyze(context RespHandleContext, httpResponse *http.Response) error {
