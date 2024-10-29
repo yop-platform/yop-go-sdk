@@ -50,7 +50,10 @@ func (signer *RsaSigner) SignRequest(yopRequest request.YopRequest) error {
 	var canonicalRequest = buildCanonicalRequest(yopRequest, authString, headerToSign)
 	log.Println("canonicalRequest:" + canonicalRequest)
 
-	signature, _ := utils.RsaSignBase64(canonicalRequest, yopRequest.IsvPriKey.Value, crypto.SHA256)
+	signature, err := utils.RsaSignBase64(canonicalRequest, yopRequest.IsvPriKey.Value, crypto.SHA256)
+	if nil != err {
+		return err
+	}
 	signature += "$" + "SHA256"
 	log.Println("signature:" + signature)
 	var authorizationHeader = buildAuthzHeader(authString, signature, headerToSign)
