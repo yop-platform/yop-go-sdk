@@ -6,7 +6,7 @@
 package utils
 
 import (
-	"github.com/yop-platform/yop-go-sdk/yop/request"
+	"github.com/yop-platform/yop-go-sdk/v4/yop/request"
 	"net/url"
 	"sort"
 	"strings"

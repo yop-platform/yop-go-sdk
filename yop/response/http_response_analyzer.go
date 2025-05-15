@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	log "github.com/sirupsen/logrus"
-	"github.com/yop-platform/yop-go-sdk/yop/constants"
+	"github.com/yop-platform/yop-go-sdk/v4/yop/constants"
 	"net/http"
 	"strconv"
 	"strings"

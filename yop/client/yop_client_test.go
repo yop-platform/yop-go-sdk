@@ -6,10 +6,10 @@
 package client
 
 import (
-	"github.com/yop-platform/yop-go-sdk/yop/constants"
-	"github.com/yop-platform/yop-go-sdk/yop/request"
-	"github.com/yop-platform/yop-go-sdk/yop/response"
-	"github.com/yop-platform/yop-go-sdk/yop/utils"
+	"github.com/yop-platform/yop-go-sdk/v4/yop/constants"
+	"github.com/yop-platform/yop-go-sdk/v4/yop/request"
+	"github.com/yop-platform/yop-go-sdk/v4/yop/response"
+	"github.com/yop-platform/yop-go-sdk/v4/yop/utils"
 	"os"
 	"testing"
 	"time"

@@ -1,4 +1,4 @@
-module github.com/yop-platform/yop-go-sdk
+module github.com/yop-platform/yop-go-sdk/v4
 
 go 1.18
 

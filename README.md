@@ -1,6 +1,6 @@
 # YOP Go SDK
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/yop-platform/yop-go-sdk.svg)](https://pkg.go.dev/github.com/yop-platform/yop-go-sdk)
+[![Go Reference](https://pkg.go.dev/badge/github.com/yop-platform/yop-go-sdk/v4.svg)](https://pkg.go.dev/github.com/yop-platform/yop-go-sdk/v4)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 [阅读中文文档](README_zh-CN.md)
@@ -28,7 +28,7 @@ This SDK provides a convenient way to integrate YeePay payment and other service
 Install this package using Go modules:
 
 ```bash
-go get github.com/yop-platform/yop-go-sdk
+go get github.com/yop-platform/yop-go-sdk/v4
 ```
 
 ## ⚙️ Configuration
@@ -68,10 +68,10 @@ yopRequest.Timeout = 15 // Set timeout to 15 seconds (optional)
 
 ```go
 import (
-    "github.com/yop-platform/yop-go-sdk/yop/client"
-    "github.com/yop-platform/yop-go-sdk/yop/constants"
-    "github.com/yop-platform/yop-go-sdk/yop/request"
-    "github.com/yop-platform/yop-go-sdk/yop/utils"
+    "github.com/yop-platform/yop-go-sdk/v4/yop/client"
+    "github.com/yop-platform/yop-go-sdk/v4/yop/constants"
+    "github.com/yop-platform/yop-go-sdk/v4/yop/request"
+    "github.com/yop-platform/yop-go-sdk/v4/yop/utils"
 )
 ```
 

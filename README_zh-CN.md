@@ -1,6 +1,6 @@
 # YOP Go SDK
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/yop-platform/yop-go-sdk.svg)](https://pkg.go.dev/github.com/yop-platform/yop-go-sdk)
+[![Go Reference](https://pkg.go.dev/badge/github.com/yop-platform/yop-go-sdk/v4.svg)](https://pkg.go.dev/github.com/yop-platform/yop-go-sdk/v4)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 一个专为与 YOP（易宝开放平台）API 进行无缝交互而设计的 Go SDK。
@@ -26,7 +26,7 @@
 使用 Go 模块安装此包：
 
 ```bash
-go get github.com/yop-platform/yop-go-sdk
+go get github.com/yop-platform/yop-go-sdk/v4
 ```
 
 ## ⚙️ 配置
@@ -66,10 +66,10 @@ yopRequest.Timeout = 15 // 设置超时时间为 15 秒（可选）
 
 ```go
 import (
-    "github.com/yop-platform/yop-go-sdk/yop/client"
-    "github.com/yop-platform/yop-go-sdk/yop/constants"
-    "github.com/yop-platform/yop-go-sdk/yop/request"
-    "github.com/yop-platform/yop-go-sdk/yop/utils"
+    "github.com/yop-platform/yop-go-sdk/v4/yop/client"
+    "github.com/yop-platform/yop-go-sdk/v4/yop/constants"
+    "github.com/yop-platform/yop-go-sdk/v4/yop/request"
+    "github.com/yop-platform/yop-go-sdk/v4/yop/utils"
 )
 ```
 
