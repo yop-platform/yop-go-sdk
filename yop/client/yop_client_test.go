@@ -11,6 +11,7 @@ import (
 	"github.com/yop-platform/yop-go-sdk/yop/response"
 	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"os"
+	"strings"
 	"testing"
 	"time"
 )
@@ -109,9 +110,18 @@ func buildUploadYopRequest() *request.YopRequest {
 	result.AppId = "app_15958159879157110001"
 	result.ServerRoot = "https://openapi.yeepay.com/yop-center"
 	result.IsvPriKey = priKey
+
+	// 使用当前环境中存在的文件路径
 	var path = "../../README.md"
-	f, _ := os.Open(path)
-	result.AddFile("file", f)
+	f, err := os.Open(path)
+	if err != nil {
+		// 如果文件打开失败，记录错误但不添加文件
+		utils.Logger.Println("Failed to open file:", err)
+	} else {
+		// 只有在文件成功打开时才添加到请求中
+		result.AddFile("file", f)
+	}
+
 	result.AddParam("string", "ppp")
 	return result
 }
