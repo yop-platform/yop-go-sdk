@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	uuid "github.com/satori/go.uuid"
+	log "github.com/sirupsen/logrus"
 	"github.com/yop-platform/yop-go-sdk/yop/auth"
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
@@ -31,11 +32,18 @@ type YopClient struct {
 	*http.Client
 }
 
+func init() {
+	log.SetLevel(log.InfoLevel)
+}
+
 // Request 普通请求
 func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopResponse, error) {
 	initRequest(request)
 	var signer = auth.RsaSigner{}
-	signer.SignRequest(*request)
+	err := signer.SignRequest(*request)
+	if nil != err {
+		return nil, err
+	}
 
 	httpRequest, err := buildHttpRequest(*request)
 	if nil != err {
@@ -126,7 +134,7 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 		req.Header.Set("Content-Type", bodyWriter.FormDataContentType())
 		result = *req
 	} else {
-		var encodedParam = utils.EncodeParameters(yopRequest.Params)
+		var encodedParam = utils.EncodeParameters(yopRequest.Params, false)
 		var requestHasPayload = 0 < len(yopRequest.Content)
 		var requestIsPost = 0 == strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod)
 		var putParamsInUri = !requestIsPost || requestHasPayload

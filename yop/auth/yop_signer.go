@@ -9,6 +9,7 @@ import (
 	"crypto"
 	"crypto/sha256"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
 	"github.com/yop-platform/yop-go-sdk/yop/utils"
@@ -24,7 +25,7 @@ var DEFAULT_HEADERS_TO_SIGN []string = []string{constants.YOP_APPKEY_HEADER_KEY,
 
 type YopSigner interface {
 	// SignRequest 请求报文签名
-	SignRequest(yopRequest request.YopRequest)
+	SignRequest(yopRequest request.YopRequest) error
 
 	// VerifyResponse 响应报文验签
 	VerifyResponse(content string, signature string, pubKey request.PlatformPubKey) bool
@@ -33,7 +34,11 @@ type YopSigner interface {
 type RsaSigner struct {
 }
 
-func (signer *RsaSigner) SignRequest(yopRequest request.YopRequest) {
+func init() {
+	log.SetLevel(log.InfoLevel)
+}
+
+func (signer *RsaSigner) SignRequest(yopRequest request.YopRequest) error {
 	var authString = buildAuthString(yopRequest.AppId)
 	utils.Logger.Println("authString:" + authString)
 
@@ -45,12 +50,16 @@ func (signer *RsaSigner) SignRequest(yopRequest request.YopRequest) {
 	var canonicalRequest = buildCanonicalRequest(yopRequest, authString, headerToSign)
 	utils.Logger.Println("canonicalRequest:" + canonicalRequest)
 
-	signature, _ := utils.RsaSignBase64(canonicalRequest, yopRequest.IsvPriKey.Value, crypto.SHA256)
+	signature, err := utils.RsaSignBase64(canonicalRequest, yopRequest.IsvPriKey.Value, crypto.SHA256)
+	if nil != err {
+		return err
+	}
 	signature += "$" + "SHA256"
 	utils.Logger.Println("signature:" + signature)
 	var authorizationHeader = buildAuthzHeader(authString, signature, headerToSign)
 	utils.Logger.Println("Authorization:" + authorizationHeader)
 	yopRequest.Headers[constants.AUTHORIZATION] = authorizationHeader
+	return nil
 }
 
 func (signer *RsaSigner) VerifyResponse(content string, signature string, pubKey request.PlatformPubKey) bool {
