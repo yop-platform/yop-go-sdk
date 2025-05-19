@@ -40,24 +40,24 @@ func init() {
 
 func (signer *RsaSigner) SignRequest(yopRequest request.YopRequest) error {
 	var authString = buildAuthString(yopRequest.AppId)
-	log.Println("authString:" + authString)
+	utils.Logger.Println("authString:" + authString)
 
 	var contentHash = calculateContentHash(yopRequest)
-	log.Println("contentHash:" + contentHash)
+	utils.Logger.Println("contentHash:" + contentHash)
 	yopRequest.Headers[constants.YOP_CONTENT_SHA256] = contentHash
 
 	var headerToSign = getHeaderToSign(yopRequest)
 	var canonicalRequest = buildCanonicalRequest(yopRequest, authString, headerToSign)
-	log.Println("canonicalRequest:" + canonicalRequest)
+	utils.Logger.Println("canonicalRequest:" + canonicalRequest)
 
 	signature, err := utils.RsaSignBase64(canonicalRequest, yopRequest.IsvPriKey.Value, crypto.SHA256)
 	if nil != err {
 		return err
 	}
 	signature += "$" + "SHA256"
-	log.Println("signature:" + signature)
+	utils.Logger.Println("signature:" + signature)
 	var authorizationHeader = buildAuthzHeader(authString, signature, headerToSign)
-	log.Println("Authorization:" + authorizationHeader)
+	utils.Logger.Println("Authorization:" + authorizationHeader)
 	yopRequest.Headers[constants.AUTHORIZATION] = authorizationHeader
 	return nil
 }
@@ -75,7 +75,7 @@ func calculateContentHash(yopRequest request.YopRequest) string {
 	} else {
 		encodedParameters = yopRequest.Content
 	}
-	log.Println("encodedParameters:" + encodedParameters)
+	utils.Logger.Println("encodedParameters:" + encodedParameters)
 	return fmt.Sprintf("%x", sha256.Sum256([]byte(encodedParameters)))
 }
 
