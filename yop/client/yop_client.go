@@ -7,6 +7,7 @@ package client
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"github.com/gofrs/uuid/v5"
 	"github.com/yop-platform/yop-go-sdk/yop/auth"
@@ -16,12 +17,12 @@ import (
 	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"io"
 	"io/ioutil"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"net/url"
 	"runtime"
 	"strings"
+	"time"
 )
 
 var DefaultClient = YopClient{&http.Client{Transport: http.DefaultTransport}}
@@ -30,11 +31,18 @@ type YopClient struct {
 	*http.Client
 }
 
+func init() {
+	log.SetLevel(log.InfoLevel)
+}
+
 // Request 普通请求
 func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopResponse, error) {
 	initRequest(request)
 	var signer = auth.RsaSigner{}
-	signer.SignRequest(*request)
+	err := signer.SignRequest(*request)
+	if nil != err {
+		return nil, err
+	}
 
 	httpRequest, err := buildHttpRequest(*request)
 	if nil != err {
@@ -44,11 +52,16 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 	if nil != err {
 		return nil, err
 	}
+	defer httpResp.Body.Close()
 	body, err := ioutil.ReadAll(httpResp.Body)
 	if nil != err {
 		return nil, err
 	}
 	var yopResponse = response.YopResponse{Content: body}
+	metaData := response.YopResponseMetadata{}
+	metaData.YopSign = httpResp.Header.Get("X-Yop-Sign")
+	metaData.YopRequestId = httpResp.Header.Get("X-Yop-Request-Id")
+	yopResponse.Metadata = &metaData
 	context := response.RespHandleContext{YopSigner: &signer, YopResponse: &yopResponse, YopRequest: *request}
 	for i := range response.ANALYZER_CHAIN {
 		err = response.ANALYZER_CHAIN[i].Analyze(context, httpResp)
@@ -59,8 +72,8 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 	return &yopResponse, nil
 }
 func initRequest(yopRequest *request.YopRequest) {
-	yopRequest.RequestId = uuid.Must(uuid.NewV4()).String()
-	log.Println("requestId:" + yopRequest.RequestId)
+	yopRequest.RequestId = uuid.NewV4().String()
+	utils.Logger.Println("requestId:" + yopRequest.RequestId)
 	if 0 == len(yopRequest.ServerRoot) {
 		yopRequest.HandleServerRoot()
 	}
@@ -78,10 +91,16 @@ func addStandardHeaders(yopRequest *request.YopRequest) {
 }
 
 func buildUserAgent() string {
-	return "go" + "/" + "4.3.0" + "/" + runtime.GOOS + "/" + runtime.Version() + runtime.GOROOT()
+	return "go" + "/" + constants.SDK_VERSION + "/" + runtime.GOOS + "/" + runtime.Version()
 }
 
 func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
+	if yopRequest.Timeout == 0 {
+		yopRequest.Timeout = 10 * time.Second
+	}
+	ctx, _ := context.WithTimeout(context.Background(), yopRequest.Timeout)
+	//defer cancel()
+
 	var uri = yopRequest.ServerRoot + yopRequest.ApiUri
 	isMultiPart, err := checkForMultiPart(yopRequest)
 	if nil != err {
@@ -94,7 +113,7 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 
 		for k, v := range yopRequest.Params {
 			for i := range v {
-				bodyWriter.WriteField(k, v[i])
+				bodyWriter.WriteField(k, url.QueryEscape(v[i]))
 			}
 		}
 
@@ -107,14 +126,14 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 		if err != nil {
 			return http.Request{}, err
 		}
-		req, err := http.NewRequest("POST", uri, bodyBuf)
+		req, err := http.NewRequestWithContext(ctx, "POST", uri, bodyBuf)
 		if nil != err {
 			return http.Request{}, err
 		}
 		req.Header.Set("Content-Type", bodyWriter.FormDataContentType())
 		result = *req
 	} else {
-		var encodedParam = utils.EncodeParameters(yopRequest.Params)
+		var encodedParam = utils.EncodeParameters(yopRequest.Params, false)
 		var requestHasPayload = 0 < len(yopRequest.Content)
 		var requestIsPost = 0 == strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod)
 		var putParamsInUri = !requestIsPost || requestHasPayload
@@ -129,14 +148,14 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 				formValues := url.Values{}
 				for k, v := range yopRequest.Params {
 					for i := range v {
-						formValues.Set(k, v[i])
+						formValues.Set(k, url.QueryEscape(v[i]))
 					}
 				}
 				formDataStr := formValues.Encode()
 				body = bytes.NewBuffer([]byte(formDataStr))
 			}
 		}
-		httpRequest, err := http.NewRequest(yopRequest.HttpMethod, uri, body)
+		httpRequest, err := http.NewRequestWithContext(ctx, yopRequest.HttpMethod, uri, body)
 		if err != nil {
 			return http.Request{}, err
 		}
@@ -153,7 +172,7 @@ func checkForMultiPart(yopRequest request.YopRequest) (bool, error) {
 	var result = nil != yopRequest.Files && 0 < len(yopRequest.Files)
 	if result && 0 != strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod) {
 		var errorMsg = "ContentType:multipart/form-data only support Post Request"
-		log.Fatal(errorMsg)
+		utils.Logger.Println("error: " + errorMsg)
 		return false, errors.New(errorMsg)
 	}
 	return result, nil

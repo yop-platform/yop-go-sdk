@@ -10,11 +10,11 @@ import (
 	"fmt"
 	"github.com/gofrs/uuid/v5"
 	"html/template"
-	"log"
 	"os"
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -42,6 +42,14 @@ type YopRequest struct {
 	Headers map[string]string
 	// 文件
 	Files map[string]*os.File
+
+	// 超时时间
+	Timeout time.Duration
+}
+
+// NewYopRequest 创建请求
+func NewYopRequest(httpMethod string, apiUri string) *YopRequest {
+	return &YopRequest{HttpMethod: httpMethod, ApiUri: apiUri, Timeout: 10 * time.Second}
 }
 
 func (request *YopRequest) AddParam(name string, value any) {
@@ -149,7 +157,7 @@ func ToStringE(i any) string {
 	case error:
 		return s.Error()
 	default:
-		log.Fatal(fmt.Sprintf("unable to cast %#v of type %T to string", i, i))
+		utils.Logger.Println(fmt.Sprintf("unable to cast %#v of type %T to string", i, i))
 		return ""
 	}
 }
