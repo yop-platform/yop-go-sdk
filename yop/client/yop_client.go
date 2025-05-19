@@ -31,10 +31,6 @@ type YopClient struct {
 	*http.Client
 }
 
-func init() {
-	log.SetLevel(log.InfoLevel)
-}
-
 // Request 普通请求
 func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopResponse, error) {
 	initRequest(request)
@@ -72,7 +68,7 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 	return &yopResponse, nil
 }
 func initRequest(yopRequest *request.YopRequest) {
-	yopRequest.RequestId = uuid.NewV4().String()
+	yopRequest.RequestId = uuid.Must(uuid.NewV4()).String()
 	utils.Logger.Println("requestId:" + yopRequest.RequestId)
 	if 0 == len(yopRequest.ServerRoot) {
 		yopRequest.HandleServerRoot()

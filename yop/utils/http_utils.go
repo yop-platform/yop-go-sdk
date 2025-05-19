@@ -6,7 +6,6 @@
 package utils
 
 import (
-	"github.com/yop-platform/yop-go-sdk/yop/request"
 	"net/url"
 	"sort"
 	"strings"
@@ -68,10 +67,4 @@ func GetCanonicalQueryString(params map[string][]string) string {
 	}
 	sort.Strings(parameterStrings)
 	return strings.Join(parameterStrings, "&")
-}
-
-func UsePayloadForQueryParameters(yopRequest request.YopRequest) bool {
-	var requestIsPOST = 0 == strings.Compare("POST", yopRequest.HttpMethod)
-	var requestHasNoPayload = 0 == len(yopRequest.Content)
-	return requestIsPOST && requestHasNoPayload
 }

@@ -9,7 +9,6 @@ import (
 	"crypto"
 	"crypto/sha256"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
 	"github.com/yop-platform/yop-go-sdk/yop/utils"
@@ -32,10 +31,6 @@ type YopSigner interface {
 }
 
 type RsaSigner struct {
-}
-
-func init() {
-	log.SetLevel(log.InfoLevel)
 }
 
 func (signer *RsaSigner) SignRequest(yopRequest request.YopRequest) error {
@@ -70,7 +65,7 @@ func (signer *RsaSigner) VerifyResponse(content string, signature string, pubKey
 
 func calculateContentHash(yopRequest request.YopRequest) string {
 	var encodedParameters = ""
-	if utils.UsePayloadForQueryParameters(yopRequest) {
+	if request.UsePayloadForQueryParameters(yopRequest) {
 		encodedParameters = utils.GetCanonicalQueryString(yopRequest.Params)
 	} else {
 		encodedParameters = yopRequest.Content
@@ -90,7 +85,7 @@ func buildAuthString(appId string) string {
 }
 
 func getCanonicalQueryString(yopRequest request.YopRequest) string {
-	if utils.UsePayloadForQueryParameters(yopRequest) {
+	if request.UsePayloadForQueryParameters(yopRequest) {
 		return ""
 	}
 	return utils.GetCanonicalQueryString(yopRequest.Params)

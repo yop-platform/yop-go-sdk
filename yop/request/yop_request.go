@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gofrs/uuid/v5"
+	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"html/template"
 	"os"
 	"reflect"
@@ -171,4 +172,10 @@ func indirectToStringerOrError(a any) any {
 		v = v.Elem()
 	}
 	return v.Interface()
+}
+
+func UsePayloadForQueryParameters(yopRequest YopRequest) bool {
+	var requestIsPOST = 0 == strings.Compare("POST", yopRequest.HttpMethod)
+	var requestHasNoPayload = 0 == len(yopRequest.Content)
+	return requestIsPOST && requestHasNoPayload
 }
