@@ -142,7 +142,7 @@ jobs:
       - name: Run govulncheck
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@latest
-          govulncheck ./...
+          govulncheck ./yop/...
 
   # Dependency scanning
   dependency-check:
@@ -160,11 +160,11 @@ jobs:
       - name: Check for known vulnerabilities
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@latest
-          govulncheck ./...
+          govulncheck ./yop/...
 
       - name: Run Nancy (dependency vulnerability scanner)
         run: |
-          go list -json -deps ./... | docker run --rm -i sonatypecommunity/nancy:latest sleuth
+          go list -json -deps ./yop/... | docker run --rm -i sonatypecommunity/nancy:latest sleuth
 
   # Performance benchmarks
   benchmark:
@@ -182,7 +182,7 @@ jobs:
 
       - name: Run benchmarks
         run: |
-          go test -bench=. -benchmem -run=^$ ./... > benchmark.txt
+          go test -bench=. -benchmem -run=^$ ./yop/... > benchmark.txt
           cat benchmark.txt
 
       - name: Upload benchmark results

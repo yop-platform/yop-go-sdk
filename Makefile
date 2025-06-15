@@ -75,11 +75,11 @@ verify: ## Verify dependencies
 # Security
 security: install-gosec ## Run security scan
 	@echo "Running security scan..."
-	gosec ./...
+	gosec ./yop/...
 
 vuln-check: install-govulncheck ## Check for vulnerabilities
 	@echo "Checking for vulnerabilities..."
-	govulncheck ./...
+	govulncheck ./yop/...
 
 # Tool installation
 install-tools: install-golangci-lint install-goimports install-gosec install-govulncheck ## Install all development tools
