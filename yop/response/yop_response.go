@@ -6,9 +6,10 @@
 package response
 
 import (
+	"time"
+
 	"github.com/yop-platform/yop-go-sdk/yop/auth"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
-	"time"
 )
 
 type YopResponse struct {

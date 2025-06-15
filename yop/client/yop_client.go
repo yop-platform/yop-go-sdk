@@ -9,11 +9,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"github.com/yop-platform/yop-go-sdk/yop/auth"
-	"github.com/yop-platform/yop-go-sdk/yop/constants"
-	"github.com/yop-platform/yop-go-sdk/yop/request"
-	"github.com/yop-platform/yop-go-sdk/yop/response"
-	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -22,6 +17,12 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/yop-platform/yop-go-sdk/yop/auth"
+	"github.com/yop-platform/yop-go-sdk/yop/constants"
+	"github.com/yop-platform/yop-go-sdk/yop/request"
+	"github.com/yop-platform/yop-go-sdk/yop/response"
+	"github.com/yop-platform/yop-go-sdk/yop/utils"
 )
 
 var DefaultClient = YopClient{&http.Client{Transport: http.DefaultTransport}}

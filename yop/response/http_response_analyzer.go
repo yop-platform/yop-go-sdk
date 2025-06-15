@@ -8,11 +8,13 @@ package response
 import (
 	"encoding/json"
 	"errors"
-	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/yop-platform/yop-go-sdk/yop/constants"
+	"github.com/yop-platform/yop-go-sdk/yop/utils"
 )
 
 var ANALYZER_CHAIN = []HttpResponseAnalyzer{
@@ -61,12 +63,15 @@ type YopErrorResponseAnalyzer struct {
 
 func (yopErrorResponseAnalyzer *YopErrorResponseAnalyzer) Analyze(context RespHandleContext, httpResponse *http.Response) error {
 	var statusCode = httpResponse.StatusCode
-	log.Println("statusCode:" + strconv.Itoa(statusCode))
+	utils.Logger.Println("statusCode:" + strconv.Itoa(statusCode))
 	if statusCode/100 == constants.SC_OK && statusCode != constants.SC_NO_CONTENT {
 		return nil
 	}
 	var yopServiceError = YopServiceError{}
-	json.Unmarshal(context.YopResponse.Content, &yopServiceError)
+	err := json.Unmarshal(context.YopResponse.Content, &yopServiceError)
+	if err != nil {
+		return err
+	}
 	if 0 < len(yopServiceError.Message) {
 		return &yopServiceError
 	}
@@ -78,7 +83,10 @@ type YopJsonResponseAnalyzer struct {
 
 func (yopJsonResponseAnalyzer *YopJsonResponseAnalyzer) Analyze(context RespHandleContext, httpResponse *http.Response) error {
 	if 0 < len(context.YopResponse.Content) && strings.HasPrefix(context.YopResponse.Metadata.ContentType, constants.YOP_HTTP_CONTENT_TYPE_JSON) {
-		json.Unmarshal(context.YopResponse.Content, &context.YopResponse)
+		err := json.Unmarshal(context.YopResponse.Content, &context.YopResponse)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

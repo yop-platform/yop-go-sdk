@@ -8,7 +8,6 @@ package request
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"html/template"
 	"log"
 	"os"
@@ -16,6 +15,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/yop-platform/yop-go-sdk/yop/utils"
 )
 
 const (

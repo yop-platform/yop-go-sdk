@@ -8,13 +8,14 @@ package client
 import (
 	"encoding/json"
 	"errors"
+	"os"
+	"strings"
+	"testing"
+
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
 	"github.com/yop-platform/yop-go-sdk/yop/response"
 	"github.com/yop-platform/yop-go-sdk/yop/utils"
-	"os"
-	"strings"
-	"testing"
 )
 
 func TestYopClient_GET_Request(t *testing.T) {

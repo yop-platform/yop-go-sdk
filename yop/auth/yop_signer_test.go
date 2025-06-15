@@ -6,8 +6,9 @@
 package auth
 
 import (
-	"github.com/yop-platform/yop-go-sdk/yop/request"
 	"testing"
+
+	"github.com/yop-platform/yop-go-sdk/yop/request"
 )
 
 func TestRsaSigner_SignRequest(t *testing.T) {

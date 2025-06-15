@@ -2,9 +2,10 @@ package utils
 
 import (
 	"fmt"
-	"github.com/gofrs/uuid/v5"
 	"os"
 	"time"
+
+	"github.com/gofrs/uuid/v5"
 )
 
 // GenerateRequestID 生成请求ID，如果UUID生成失败则使用备用方案
