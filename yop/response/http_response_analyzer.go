@@ -63,7 +63,7 @@ type YopErrorResponseAnalyzer struct {
 
 func (yopErrorResponseAnalyzer *YopErrorResponseAnalyzer) Analyze(context RespHandleContext, httpResponse *http.Response) error {
 	var statusCode = httpResponse.StatusCode
-	utils.Logger.Println("statusCode:" + strconv.Itoa(statusCode))
+	utils.Logger.Info("statusCode:" + strconv.Itoa(statusCode))
 	if statusCode/100 == constants.SC_OK && statusCode != constants.SC_NO_CONTENT {
 		return nil
 	}

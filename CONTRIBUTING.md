@@ -45,9 +45,12 @@ Pull requests are the best way to propose changes to the codebase. We actively w
 
 3. **Install development tools**
    ```bash
-   # Install golangci-lint
-   curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
-   
+   # Install staticcheck (recommended for Go 1.23+)
+   go install honnef.co/go/tools/cmd/staticcheck@latest
+
+   # Install golangci-lint (optional, may have compatibility issues with Go 1.23+)
+   curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.2
+
    # Install goimports
    go install golang.org/x/tools/cmd/goimports@latest
    ```
@@ -71,9 +74,13 @@ We follow the standard Go code style guidelines:
 
 ### Linting
 
-We use `golangci-lint` for code linting. Run it before submitting:
+We use `staticcheck` for code linting (recommended for Go 1.23+). Run it before submitting:
 
 ```bash
+# Using staticcheck (recommended)
+staticcheck ./...
+
+# Or using golangci-lint (may have compatibility issues)
 golangci-lint run
 ```
 

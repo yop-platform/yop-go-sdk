@@ -32,7 +32,7 @@ If applicable, add a minimal code sample to help explain your problem.
 
 ## Environment
 - **Go version**: [e.g. 1.21.0]
-- **SDK version**: [e.g. v1.4.39]
+- **SDK version**: [e.g. v1.4.40]
 - **OS**: [e.g. macOS, Linux, Windows]
 - **Architecture**: [e.g. amd64, arm64]
 

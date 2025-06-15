@@ -161,7 +161,7 @@ func ToStringE(i any) string {
 	case error:
 		return s.Error()
 	default:
-		utils.Logger.Printf("unable to cast %#v of type %T to string", i, i)
+		utils.Logger.Warnf("unable to cast %#v of type %T to string", i, i)
 		return ""
 	}
 }

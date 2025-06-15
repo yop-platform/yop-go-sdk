@@ -12,10 +12,12 @@ import (
 )
 
 func TestRsaSigner_SignRequest(t *testing.T) {
-	t.Skip("跳过该测试，原因：持续超时，待修复")
 	var yopRequest = buildYopRequest()
 	var signer = RsaSigner{}
-	signer.SignRequest(*yopRequest)
+	err := signer.SignRequest(*yopRequest)
+	if err != nil {
+		t.Fatalf("SignRequest failed: %v", err)
+	}
 	t.Log(yopRequest.Headers)
 }
 

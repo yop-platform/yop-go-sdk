@@ -38,7 +38,11 @@ This SDK provides a convenient way to integrate YeePay payment and other service
 Install this package using Go modules:
 
 ```bash
+# Install latest version
 go get github.com/yop-platform/yop-go-sdk
+
+# Install specific version
+go get github.com/yop-platform/yop-go-sdk@v1.4.40
 ```
 
 ## ⚙️ Configuration
@@ -294,16 +298,25 @@ yopResp, err := yopClient.Request(yopRequest)
 
 ```go
 import (
-    "log"
     "os"
     "github.com/yop-platform/yop-go-sdk/yop/utils"
+    "github.com/sirupsen/logrus"
 )
 
-// Custom log output
-utils.Logger = log.New(os.Stdout, "YOP-SDK: ", log.LstdFlags)
+// Custom log output with logrus
+logger := logrus.New()
+logger.SetOutput(os.Stdout)
+logger.SetLevel(logrus.DebugLevel)
+utils.SetLogger(logger)
+
+// Set log level
+utils.SetLogLevel(logrus.WarnLevel)
 
 // Disable log output
-utils.Logger = log.New(io.Discard, "", 0)
+utils.DisableLogging()
+
+// Enable log output
+utils.EnableLogging()
 ```
 
 ## 🚨 Error Handling

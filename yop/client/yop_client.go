@@ -13,6 +13,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -39,7 +40,16 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 		return nil, err
 	}
 
-	httpRequest, err := buildHttpRequest(*request)
+	// 设置超时时间，如果没有设置则使用默认值
+	if request.Timeout == 0 {
+		request.Timeout = 10 * time.Second
+	}
+
+	// 创建带超时的 context，在整个请求过程中保持有效
+	ctx, cancel := context.WithTimeout(context.Background(), request.Timeout)
+	defer cancel()
+
+	httpRequest, err := buildHttpRequestWithContext(ctx, *request)
 	if nil != err {
 		return nil, err
 	}
@@ -47,7 +57,11 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 	if nil != err {
 		return nil, err
 	}
-	defer httpResp.Body.Close()
+	defer func() {
+		if closeErr := httpResp.Body.Close(); closeErr != nil {
+			utils.Logger.Warnf("Failed to close response body: %v", closeErr)
+		}
+	}()
 	body, err := io.ReadAll(httpResp.Body)
 	if nil != err {
 		return nil, err
@@ -57,18 +71,19 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 	metaData.YopSign = httpResp.Header.Get("X-Yop-Sign")
 	metaData.YopRequestId = httpResp.Header.Get("X-Yop-Request-Id")
 	yopResponse.Metadata = &metaData
-	context := response.RespHandleContext{YopSigner: &signer, YopResponse: &yopResponse, YopRequest: *request}
+	handleContext := response.RespHandleContext{YopSigner: &signer, YopResponse: &yopResponse, YopRequest: *request}
 	for i := range response.ANALYZER_CHAIN {
-		err = response.ANALYZER_CHAIN[i].Analyze(context, httpResp)
+		err = response.ANALYZER_CHAIN[i].Analyze(handleContext, httpResp)
 		if nil != err {
 			return nil, err
 		}
 	}
 	return &yopResponse, nil
 }
+
 func initRequest(yopRequest *request.YopRequest) {
 	yopRequest.RequestId = utils.GenerateRequestID()
-	utils.Logger.Println("requestId:" + yopRequest.RequestId)
+	utils.Logger.Info("requestId:" + yopRequest.RequestId)
 	if len(yopRequest.ServerRoot) == 0 {
 		yopRequest.HandleServerRoot()
 	}
@@ -78,6 +93,7 @@ func initRequest(yopRequest *request.YopRequest) {
 	}
 	addStandardHeaders(yopRequest)
 }
+
 func addStandardHeaders(yopRequest *request.YopRequest) {
 	yopRequest.Headers = map[string]string{}
 	yopRequest.Headers[constants.YOP_REQUEST_ID] = yopRequest.RequestId
@@ -89,13 +105,8 @@ func buildUserAgent() string {
 	return "go" + "/" + constants.SDK_VERSION + "/" + runtime.GOOS + "/" + runtime.Version()
 }
 
-func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
-	if yopRequest.Timeout == 0 {
-		yopRequest.Timeout = 10 * time.Second
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), yopRequest.Timeout)
-	defer cancel()
-
+// buildHttpRequestWithContext 使用外部传入的 context 构建 HTTP 请求
+func buildHttpRequestWithContext(ctx context.Context, yopRequest request.YopRequest) (http.Request, error) {
 	var uri = yopRequest.ServerRoot + yopRequest.ApiUri
 	isMultiPart, err := checkForMultiPart(yopRequest)
 	if nil != err {
@@ -108,19 +119,27 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 
 		for k, v := range yopRequest.Params {
 			for i := range v {
-				bodyWriter.WriteField(k, url.QueryEscape(v[i]))
+				if err := bodyWriter.WriteField(k, url.QueryEscape(v[i])); err != nil {
+					return http.Request{}, err
+				}
 			}
 		}
 
 		for k, v := range yopRequest.Files {
-			fileWriter, _ := bodyWriter.CreateFormFile(k, v.Name())
-			io.Copy(fileWriter, v)
+			// 只使用文件名，避免路径遍历安全问题
+			fileName := filepath.Base(v.Name())
+			fileWriter, err := bodyWriter.CreateFormFile(k, fileName)
+			if err != nil {
+				return http.Request{}, err
+			}
+			if _, err := io.Copy(fileWriter, v); err != nil {
+				return http.Request{}, err
+			}
 		}
-		bodyWriter.Close()
-
-		if err != nil {
+		if err := bodyWriter.Close(); err != nil {
 			return http.Request{}, err
 		}
+
 		req, err := http.NewRequestWithContext(ctx, "POST", uri, bodyBuf)
 		if nil != err {
 			return http.Request{}, err
@@ -167,7 +186,7 @@ func checkForMultiPart(yopRequest request.YopRequest) (bool, error) {
 	var result = len(yopRequest.Files) > 0
 	if result && strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod) != 0 {
 		var errorMsg = "ContentType:multipart/form-data only support Post Request"
-		utils.Logger.Println("error: " + errorMsg)
+		utils.Logger.Error("error: " + errorMsg)
 		return false, errors.New(errorMsg)
 	}
 	return result, nil
