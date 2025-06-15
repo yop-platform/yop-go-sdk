@@ -94,7 +94,7 @@ install-goimports: ## Install goimports
 
 install-gosec: ## Install gosec
 	@which gosec > /dev/null || (echo "Installing gosec..." && \
-		go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest)
+		go install github.com/securego/gosec/v2/cmd/gosec@latest)
 
 install-govulncheck: ## Install govulncheck
 	@which govulncheck > /dev/null || (echo "Installing govulncheck..." && \
