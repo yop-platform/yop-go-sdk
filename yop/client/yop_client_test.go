@@ -15,7 +15,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"time"
 )
 
 func TestYopClient_GET_Request(t *testing.T) {
