@@ -86,7 +86,7 @@ install-tools: install-golangci-lint install-goimports install-gosec install-gov
 
 install-golangci-lint: ## Install golangci-lint
 	@which golangci-lint > /dev/null || (echo "Installing golangci-lint..." && \
-		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.55.2)
+		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.54.2)
 
 install-goimports: ## Install goimports
 	@which goimports > /dev/null || (echo "Installing goimports..." && \

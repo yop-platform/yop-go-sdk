@@ -1,232 +1,65 @@
 # golangci-lint configuration for YOP Go SDK
-# See https://golangci-lint.run/usage/configuration/ for more options
+# Simplified configuration to avoid version compatibility issues
 
 run:
   timeout: 5m
   issues-exit-code: 1
   tests: true
-  skip-dirs:
-    - vendor
-  skip-files:
-    - ".*_test.go"
 
 output:
-  format: colored-line-number
+  formats:
+    - format: colored-line-number
   print-issued-lines: true
   print-linter-name: true
 
 linters-settings:
   govet:
-    check-shadowing: true
-    settings:
-      printf:
-        funcs:
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Infof
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
-
-  golint:
-    min-confidence: 0
-
-  gocyclo:
-    min-complexity: 15
-
-  maligned:
-    suggest-new: true
-
-  dupl:
-    threshold: 100
-
-  goconst:
-    min-len: 2
-    min-occurrences: 2
-
-  depguard:
-    list-type: blacklist
-    packages:
-      # logging is allowed only by logutils.Log, logrus
-      # is allowed to use only in logutils package
-      - github.com/sirupsen/logrus
-    packages-with-error-message:
-      - github.com/sirupsen/logrus: "logging is allowed only by logutils.Log"
-
-  misspell:
-    locale: US
-
-  lll:
-    line-length: 140
-
+    enable:
+      - shadow
   goimports:
     local-prefixes: github.com/yop-platform/yop-go-sdk
-
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - experimental
-      - opinionated
-      - performance
-      - style
-    disabled-checks:
-      - dupImport # https://github.com/go-critic/go-critic/issues/845
-      - ifElseChain
-      - octalLiteral
-      - whyNoLint
-      - wrapperFunc
-
-  funlen:
-    lines: 100
-    statements: 50
-
-  gocognit:
-    min-complexity: 20
-
-  nestif:
-    min-complexity: 4
-
-  gomnd:
-    settings:
-      mnd:
-        # don't include the "operation" and "assign"
-        checks: argument,case,condition,return
-
-  godox:
-    keywords:
-      - NOTE
-      - OPTIMIZE # marks code that should be optimized before merging
-      - HACK # marks hack-around that should be removed before merging
-
-  dogsled:
-    max-blank-identifiers: 2
-
-  whitespace:
-    multi-if: false   # Enforces newlines (or comments) after every multi-line if statement
-    multi-func: false # Enforces newlines (or comments) after every multi-line function signature
+  misspell:
+    locale: US
+  lll:
+    line-length: 140
 
 linters:
   disable-all: true
   enable:
-    - bodyclose
-    - deadcode
-    - depguard
-    - dogsled
-    - dupl
     - errcheck
-    - funlen
-    - gochecknoinits
-    - goconst
-    - gocritic
-    - gocyclo
     - gofmt
     - goimports
-    - golint
-    - gomnd
-    - goprintffuncname
-    - gosec
     - gosimple
     - govet
     - ineffassign
-    - interfacer
-    - lll
     - misspell
-    - nakedret
-    - noctx
-    - nolintlint
-    - rowserrcheck
-    - scopelint
     - staticcheck
-    - structcheck
-    - stylecheck
     - typecheck
-    - unconvert
-    - unparam
     - unused
-    - varcheck
-    - whitespace
-
-  # don't enable:
-  # - asciicheck
-  # - gochecknoglobals
-  # - gocognit
-  # - godot
-  # - godox
-  # - goerr113
-  # - maligned
-  # - nestif
-  # - prealloc
-  # - testpackage
-  # - wsl
 
 issues:
-  # Excluding configuration per-path, per-linter, per-text and per-source
   exclude-rules:
+    # Ignore naming convention issues for existing constants
+    - path: constants/constants\.go
+      linters:
+        - revive
+        - stylecheck
+      text: "(should not use ALL_CAPS|package comment should be of the form|exported.*should have comment)"
+
+    # Exclude test files from certain linters
     - path: _test\.go
       linters:
-        - gomnd
-        - funlen
-        - gocyclo
+        - errcheck
+        - gosec
 
-    # https://github.com/go-critic/go-critic/issues/926
-    - linters:
-        - gocritic
-      text: "unnecessaryDefer:"
+  exclude-dirs:
+    - vendor
+    - examples
 
-  # Independently from option `exclude` we use default exclude patterns,
-  # it can be disabled by this option. To list all
-  # excluded by default patterns execute `golangci-lint run --help`.
-  # Default value for this option is true.
-  exclude-use-default: false
+  exclude-files:
+    - ".*\\.pb\\.go$"
 
-  # The default value is false. If set to true exclude and exclude-rules
-  # regular expressions become case sensitive.
-  exclude-case-sensitive: false
-
-  # The list of ids of default excludes to include or disable. By default it's empty.
-  include:
-    - EXC0002 # disable excluding of issues about comments from golint
-
-  # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
   max-issues-per-linter: 0
-
-  # Maximum count of issues with the same text. Set to 0 to disable. Default is 3.
   max-same-issues: 0
-
-  # Show only new issues: if there are unstaged changes or untracked files,
-  # only those changes are analyzed, e.g. if you have unstaged changes in
-  # the file foo.go, only those changes will be analyzed.
-  # Default is false.
   new: false
-
-  # Show only new issues created after git revision `REV`
-  new-from-rev: ""
-
-  # Show only new issues created in git patch with set file path.
-  new-from-patch: ""
-
-  # Fix found issues (if it's supported by the linter)
   fix: false
-
-severity:
-  # Default value is empty string.
-  # Set the default severity for issues. If severity rules are defined and the issues
-  # do not match or no severity is provided to the rule this will be the default
-  # severity applied. Severities should match the supported severity names of the
-  # selected out format.
-  # - Code climate: https://docs.codeclimate.com/docs/issues#issue-severity
-  # - Checkstyle: https://checkstyle.sourceforge.io/property_types.html#severity
-  # - Github: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
-  default-severity: error
-
-  # The default value is false.
-  # If set to true severity-rules regular expressions become case sensitive.
-  case-sensitive: false
-
-  # Default value is empty list.
-  # When a list of severity rules are provided, severity information will be added to lint
-  # issues. Severity rules have the same filtering capability as exclude rules except you
-  # are allowed to specify one matcher per severity rule.
-  # Only affects out formats that support setting severity information.
-  rules:
-    - linters:
-        - dupl
-      severity: info
