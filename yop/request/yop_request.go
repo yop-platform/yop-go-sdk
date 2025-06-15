@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"log"
 	"os"
 	"reflect"
 	"strconv"
@@ -161,7 +160,7 @@ func ToStringE(i any) string {
 	case error:
 		return s.Error()
 	default:
-		log.Fatal(fmt.Sprintf("unable to cast %#v of type %T to string", i, i))
+		utils.Logger.Printf("unable to cast %#v of type %T to string", i, i)
 		return ""
 	}
 }

@@ -69,10 +69,10 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 func initRequest(yopRequest *request.YopRequest) {
 	yopRequest.RequestId = utils.GenerateRequestID()
 	utils.Logger.Println("requestId:" + yopRequest.RequestId)
-	if 0 == len(yopRequest.ServerRoot) {
+	if len(yopRequest.ServerRoot) == 0 {
 		yopRequest.HandleServerRoot()
 	}
-	if 0 == len(yopRequest.PlatformPubKey.Value) {
+	if len(yopRequest.PlatformPubKey.Value) == 0 {
 		yopRequest.PlatformPubKey.Value = request.YOP_PLATFORM_PUBLIC_KEY
 		yopRequest.PlatformPubKey.CertType = request.RSA2048
 	}
@@ -129,10 +129,10 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 		result = *req
 	} else {
 		var encodedParam = utils.EncodeParameters(yopRequest.Params, false)
-		var requestHasPayload = 0 < len(yopRequest.Content)
-		var requestIsPost = 0 == strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod)
+		var requestHasPayload = len(yopRequest.Content) > 0
+		var requestIsPost = strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod) == 0
 		var putParamsInUri = !requestIsPost || requestHasPayload
-		if 0 < len(encodedParam) && putParamsInUri {
+		if len(encodedParam) > 0 && putParamsInUri {
 			uri += "?" + encodedParam
 		}
 		var body io.Reader = nil
