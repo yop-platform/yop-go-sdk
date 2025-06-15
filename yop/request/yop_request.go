@@ -8,7 +8,6 @@ package request
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gofrs/uuid/v5"
 	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"html/template"
 	"os"
@@ -50,7 +49,7 @@ type YopRequest struct {
 
 // NewYopRequest 创建请求
 func NewYopRequest(httpMethod string, apiUri string) *YopRequest {
-	return &YopRequest{HttpMethod: httpMethod, ApiUri: apiUri, Timeout: 10 * time.Second}
+	return &YopRequest{HttpMethod: httpMethod, ApiUri: apiUri, Timeout: 60 * time.Second}
 }
 
 func (request *YopRequest) AddParam(name string, value any) {
@@ -86,7 +85,9 @@ type PlatformPubKey struct {
 func BuildYopRequest() *YopRequest {
 	var isvPriKey = IsvPriKey{CertType: RSA2048}
 	var platformCert = PlatformPubKey{Value: YOP_PLATFORM_PUBLIC_KEY, CertType: RSA2048}
-	return &YopRequest{RequestId: uuid.Must(uuid.NewV4()).String(), IsvPriKey: isvPriKey, PlatformPubKey: platformCert, Params: map[string][]string{}, Headers: map[string]string{}, Files: map[string]*os.File{}}
+	var requestId = utils.GenerateRequestID()
+
+	return &YopRequest{RequestId: requestId, IsvPriKey: isvPriKey, PlatformPubKey: platformCert, Params: map[string][]string{}, Headers: map[string]string{}, Files: map[string]*os.File{}, Timeout: 60 * time.Second}
 }
 
 func (request *YopRequest) HandleServerRoot() {

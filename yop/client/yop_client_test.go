@@ -6,6 +6,8 @@
 package client
 
 import (
+	"encoding/json"
+	"errors"
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
 	"github.com/yop-platform/yop-go-sdk/yop/response"
@@ -43,16 +45,17 @@ func TestYopClient_Download_Request(t *testing.T) {
 
 func testAssert(resp *response.YopResponse, err error, t *testing.T) {
 	if nil != err {
-		// 对于上传测试，如果是 JSON 解析错误，我们可以忽略它
-		// 因为测试服务器可能返回了非 JSON 响应（如 HTML 错误页面）
-		if strings.Contains(err.Error(), "invalid character") && strings.Contains(t.Name(), "Upload") {
-			t.Log("Ignoring JSON parsing error for upload test: " + err.Error())
-			// 确保 resp 不为 nil 再访问其内容
-			if resp != nil {
-				t.Log("Response content: " + string(resp.Content))
-			}
-			return
-		}
+		// 对于上传测试，检查是否为JSON解析错误
+		var jsonErr *json.SyntaxError
+        var jsonUnmarshalErr *json.UnmarshalTypeError
+        if (errors.As(err, &jsonErr) || errors.As(err, &jsonUnmarshalErr)) && strings.Contains(t.Name(), "Upload") {
+            t.Log("Ignoring JSON parsing error for upload test: " + err.Error())
+            // 确保 resp 不为 nil 再访问其内容
+            if resp != nil {
+                t.Log("Response content: " + string(resp.Content))
+            }
+            return
+        }
 		t.Fatal(err.Error())
 	}
 

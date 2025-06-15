@@ -9,7 +9,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"github.com/gofrs/uuid/v5"
 	"github.com/yop-platform/yop-go-sdk/yop/auth"
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
@@ -68,7 +67,7 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 	return &yopResponse, nil
 }
 func initRequest(yopRequest *request.YopRequest) {
-	yopRequest.RequestId = uuid.Must(uuid.NewV4()).String()
+	yopRequest.RequestId = utils.GenerateRequestID()
 	utils.Logger.Println("requestId:" + yopRequest.RequestId)
 	if 0 == len(yopRequest.ServerRoot) {
 		yopRequest.HandleServerRoot()
@@ -92,7 +91,7 @@ func buildUserAgent() string {
 
 func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 	if yopRequest.Timeout == 0 {
-		yopRequest.Timeout = 10 * time.Second
+		yopRequest.Timeout = 60 * time.Second
 	}
 	ctx, _ := context.WithTimeout(context.Background(), yopRequest.Timeout)
 	//defer cancel()
