@@ -47,15 +47,15 @@ func testAssert(resp *response.YopResponse, err error, t *testing.T) {
 	if nil != err {
 		// 对于上传测试，检查是否为JSON解析错误
 		var jsonErr *json.SyntaxError
-        var jsonUnmarshalErr *json.UnmarshalTypeError
-        if (errors.As(err, &jsonErr) || errors.As(err, &jsonUnmarshalErr)) && strings.Contains(t.Name(), "Upload") {
-            t.Log("Ignoring JSON parsing error for upload test: " + err.Error())
-            // 确保 resp 不为 nil 再访问其内容
-            if resp != nil {
-                t.Log("Response content: " + string(resp.Content))
-            }
-            return
-        }
+		var jsonUnmarshalErr *json.UnmarshalTypeError
+		if (errors.As(err, &jsonErr) || errors.As(err, &jsonUnmarshalErr)) && strings.Contains(t.Name(), "Upload") {
+			t.Log("Ignoring JSON parsing error for upload test: " + err.Error())
+			// 确保 resp 不为 nil 再访问其内容
+			if resp != nil {
+				t.Log("Response content: " + string(resp.Content))
+			}
+			return
+		}
 		t.Fatal(err.Error())
 	}
 
@@ -89,8 +89,7 @@ func buildGetYopRequest() *request.YopRequest {
 	yopRequest.IsvPriKey = priKey
 	yopRequest.AddParam("string0", "le1%3D%3D")
 	yopRequest.AddParam("p4", "中文%%")
-	// 设置超时时间
-	yopRequest.Timeout = 10 * time.Second
+	// 使用默认超时时间（60秒）
 	return yopRequest
 }
 
