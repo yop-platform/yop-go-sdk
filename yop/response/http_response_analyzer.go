@@ -8,12 +8,13 @@ package response
 import (
 	"encoding/json"
 	"errors"
-	"github.com/yop-platform/yop-go-sdk/yop/constants"
-	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/yop-platform/yop-go-sdk/yop/constants"
+	"github.com/yop-platform/yop-go-sdk/yop/utils"
 )
 
 var ANALYZER_CHAIN = []HttpResponseAnalyzer{
