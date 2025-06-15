@@ -18,7 +18,7 @@ func TestRsaSignBase64(t *testing.T) {
 		t.Fatal("exception happened")
 	}
 
-	if 0 == len(signature) {
+	if len(signature) == 0 {
 		t.Fatal("signature is empty")
 	}
 	t.Log(signature)

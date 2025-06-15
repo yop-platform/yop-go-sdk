@@ -92,14 +92,15 @@ func BuildYopRequest() *YopRequest {
 }
 
 func (request *YopRequest) HandleServerRoot() {
-	if 0 != len(request.ServerRoot) {
+	if len(request.ServerRoot) != 0 {
 		return
 	}
 
-	if 0 != len(request.ApiUri) || strings.HasPrefix(request.ApiUri, "/yos") {
+	if strings.HasPrefix(request.ApiUri, "/yos") {
 		request.ServerRoot = YOS_SERVER_ROOT
+	} else {
+		request.ServerRoot = SERVER_ROOT
 	}
-	request.ServerRoot = SERVER_ROOT
 
 }
 
@@ -177,7 +178,7 @@ func indirectToStringerOrError(a any) any {
 }
 
 func UsePayloadForQueryParameters(yopRequest YopRequest) bool {
-	var requestIsPOST = 0 == strings.Compare("POST", yopRequest.HttpMethod)
-	var requestHasNoPayload = 0 == len(yopRequest.Content)
+	var requestIsPOST = strings.Compare("POST", yopRequest.HttpMethod) == 0
+	var requestHasNoPayload = len(yopRequest.Content) == 0
 	return requestIsPOST && requestHasNoPayload
 }

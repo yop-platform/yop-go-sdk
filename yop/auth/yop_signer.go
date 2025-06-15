@@ -93,7 +93,7 @@ func getCanonicalQueryString(yopRequest request.YopRequest) string {
 }
 
 func getCanonicalURIPath(path string) string {
-	if 0 == len(path) {
+	if len(path) == 0 {
 		return "/"
 	} else if strings.HasPrefix(path, "/") {
 		return utils.NormalizePath(path)
@@ -106,7 +106,7 @@ func getHeaderToSign(yopRequest request.YopRequest) []string {
 	var result []string
 	for header := range DEFAULT_HEADERS_TO_SIGN {
 		var value = yopRequest.Headers[DEFAULT_HEADERS_TO_SIGN[header]]
-		if 0 != len(value) {
+		if len(value) != 0 {
 			result = append(result, DEFAULT_HEADERS_TO_SIGN[header])
 		}
 	}

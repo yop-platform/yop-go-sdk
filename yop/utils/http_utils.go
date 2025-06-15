@@ -28,7 +28,7 @@ func encodeSpecialChar(str string) string {
 }
 
 func EncodeParameters(params map[string][]string, forSign bool) string {
-	if 0 == len(params) {
+	if len(params) == 0 {
 		return ""
 	}
 	var encodedNameValuePair []string
@@ -49,14 +49,14 @@ func toNameValuePair(paramName string, paramValue string, forSign bool) string {
 }
 
 func GetCanonicalQueryString(params map[string][]string) string {
-	if 0 == len(params) {
+	if len(params) == 0 {
 		return ""
 	}
 
 	var parameterStrings []string
 
 	for k, v := range params {
-		if nil == v || 0 == len(v) {
+		if len(v) == 0 {
 			parameterStrings = append(parameterStrings, Normalize(k)+"=")
 		} else {
 			for i := range v {

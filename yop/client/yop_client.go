@@ -136,8 +136,8 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 			uri += "?" + encodedParam
 		}
 		var body io.Reader = nil
-		if 0 == strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod) {
-			if 0 < len(yopRequest.Content) {
+		if strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod) == 0 {
+			if len(yopRequest.Content) > 0 {
 				body = bytes.NewBuffer([]byte(yopRequest.Content))
 			} else {
 				formValues := url.Values{}
@@ -164,8 +164,8 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 }
 
 func checkForMultiPart(yopRequest request.YopRequest) (bool, error) {
-	var result = nil != yopRequest.Files && 0 < len(yopRequest.Files)
-	if result && 0 != strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod) {
+	var result = len(yopRequest.Files) > 0
+	if result && strings.Compare(constants.POST_HTTP_METHOD, yopRequest.HttpMethod) != 0 {
 		var errorMsg = "ContentType:multipart/form-data only support Post Request"
 		utils.Logger.Println("error: " + errorMsg)
 		return false, errors.New(errorMsg)
@@ -174,10 +174,10 @@ func checkForMultiPart(yopRequest request.YopRequest) (bool, error) {
 }
 
 func getContentType(yopRequest request.YopRequest) string {
-	if 0 == strings.Compare("POST", yopRequest.HttpMethod) && 0 < len(yopRequest.Content) {
+	if strings.Compare("POST", yopRequest.HttpMethod) == 0 && len(yopRequest.Content) > 0 {
 		return constants.YOP_HTTP_CONTENT_TYPE_JSON
 	}
-	if 0 < len(yopRequest.Params) {
+	if len(yopRequest.Params) > 0 {
 		return constants.YOP_HTTP_CONTENT_TYPE_FORM
 	}
 	return constants.YOP_HTTP_CONTENT_TYPE_FORM

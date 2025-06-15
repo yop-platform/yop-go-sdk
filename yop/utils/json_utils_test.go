@@ -12,7 +12,7 @@ func TestParseToJson(t *testing.T) {
 	params["p1"] = "11"
 	params["p2"] = 2
 	str := ParseToJsonStr(params)
-	if 0 == len(str) {
+	if len(str) == 0 {
 		t.Fatal("parse failed")
 	}
 	t.Log(str)
