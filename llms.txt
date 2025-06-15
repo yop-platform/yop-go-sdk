@@ -1,11 +1,23 @@
-TITLE: Making GET Request with YOP SDK Go
-DESCRIPTION: This snippet demonstrates how to construct and execute a GET request using the YOP Go SDK. It involves creating a new YopRequest with the GET method and API path, setting the application ID and ISV private key, adding request parameters, and calling the DefaultClient.Request method.
-SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_1
+TITLE: Configure YOP Go SDK Credentials
+DESCRIPTION: Demonstrates how to set up your App ID and Private Key for the YOP Go SDK within your Go application.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/examples/README.md#_snippet_0
 
 LANGUAGE: Go
 CODE:
 ```
+appId := "your-actual-app-id"
+privateKey := "your-actual-private-key"
+```
 
+----------------------------------------
+
+TITLE: Making GET Request with YOP SDK Go
+DESCRIPTION: This snippet demonstrates how to construct and execute a GET request using the YOP Go SDK. It involves creating a new YopRequest with the GET method and API path, setting the application ID and ISV private key, adding request parameters, and calling the DefaultClient.Request method.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/llms.txt#_snippet_0
+
+LANGUAGE: Go
+CODE:
+```
 var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
 var yopRequest = request.NewYopRequest(constants.GET_HTTP_METHOD,"/rest/v1.0/test-wdc/product-query/query-for-doc")
 yopRequest.AppId = "appId"
@@ -20,9 +32,503 @@ if nil != err{
 
 ----------------------------------------
 
+TITLE: Perform YOP Go SDK GET Request
+DESCRIPTION: This Go example demonstrates how to make a GET request using the YOP Go SDK. It initializes a `YopRequest` with the HTTP method, API path, AppId, private key, and adds a parameter before sending the request.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_4
+
+LANGUAGE: Go
+CODE:
+```
+var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+var yopRequest = request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+yopRequest.AppId = "appId"
+yopRequest.IsvPriKey = priKey
+yopRequest.AddParam("paramName", "paramValue")
+yopResp, err := client.DefaultClient.Request(yopRequest)
+if nil != err{
+    // request failed
+}
+//yopResp.Result is the request result
+```
+
+----------------------------------------
+
+TITLE: Handle Common Error Types in YOP SDK Requests
+DESCRIPTION: Provides an example of how to handle errors returned from YOP SDK requests, distinguishing between network/request building errors and business-level errors indicated by the response status.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_19
+
+LANGUAGE: go
+CODE:
+```
+yopResp, err := client.DefaultClient.Request(yopRequest)
+if err != nil {
+    // Network error or request building error
+    log.Printf("Request failed: %v", err)
+    return
+}
+
+// Check business errors
+if yopResp.Result != nil {
+    result := yopResp.Result.(map[string]interface{})
+    if status, ok := result["status"]; ok && status != "SUCCESS" {
+        log.Printf("Business error: %v", result["errorMsg"])
+        return
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Handle YOP Go SDK Request and Business Errors
+DESCRIPTION: Illustrates a robust error handling pattern for YOP Go SDK requests, covering both network/request building errors and business-level errors returned in the API response.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/examples/README.md#_snippet_2
+
+LANGUAGE: Go
+CODE:
+```
+yopResp, err := client.DefaultClient.Request(yopRequest)
+if err != nil {
+    // Handle network or request building errors
+    log.Printf("Request failed: %v", err)
+    return
+}
+
+// Check business errors
+if yopResp.Result != nil {
+    result := yopResp.Result.(map[string]interface{})
+    if status, ok := result["status"]; ok && status != "SUCCESS" {
+        log.Printf("Business error: %v", result["errorMsg"])
+        return
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Implement Retry Mechanism for YOP SDK Requests
+DESCRIPTION: Demonstrates a function that implements a retry mechanism with exponential backoff for YOP SDK requests, improving robustness against transient network issues or service unavailability.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_20
+
+LANGUAGE: go
+CODE:
+```
+func requestWithRetry(yopRequest *request.YopRequest, maxRetries int) (*response.YopResponse, error) {
+    var lastErr error
+
+    for i := 0; i <= maxRetries; i++ {
+        yopResp, err := client.DefaultClient.Request(yopRequest)
+        if err == nil {
+            return yopResp, nil
+        }
+
+        lastErr = err
+        if i < maxRetries {
+            time.Sleep(time.Duration(i+1) * time.Second) // Exponential backoff
+        }
+    }
+
+    return nil, fmt.Errorf("request failed after %d retries: %v", maxRetries, lastErr)
+}
+```
+
+----------------------------------------
+
+TITLE: Configure YOP Go SDK Request
+DESCRIPTION: This example demonstrates how to configure a YOP request in Go. It sets the application's private key, AppId, and an optional request timeout. The `YopRequest` object is central to all API interactions.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_2
+
+LANGUAGE: Go
+CODE:
+```
+var priKey = request.IsvPriKey{Value: "Your private key content", CertType: request.RSA2048}
+var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/api/path")
+yopRequest.AppId = "Your AppId"
+yopRequest.IsvPriKey = priKey
+yopRequest.Timeout = 15 * time.Second // Set timeout to 15 seconds (optional)
+```
+
+----------------------------------------
+
 TITLE: Making POST JSON Request with YOP SDK Go
 DESCRIPTION: This snippet shows how to send a POST request with a JSON request body. Instead of using AddParam, the JSON content is generated from a map using utils.ParseToJsonStr and assigned to the yopRequest.Content field before the request is executed.
-SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_3
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/llms.txt#_snippet_1
+
+LANGUAGE: Go
+CODE:
+```
+var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+  var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD,"/rest/v1.0/test-wdc/product-query/query-for-doc")
+  yopRequest.AppId = "appId"
+  yopRequest.IsvPriKey = priKey
+  // 设置json请求报文
+  var params = map[string]any{}
+  params["merchantId"] = "1595815987915711"
+  params["requestId"] = "requestId"
+  result.Content = utils.ParseToJsonStr(params)
+  
+  yopResp, err := client.DefaultClient.Request(yopRequest)
+if nil != err{ 
+	// request failed
+}
+  //yopResp.Result为请求结果
+```
+
+----------------------------------------
+
+TITLE: Perform YOP Go SDK POST JSON Request
+DESCRIPTION: This Go example demonstrates how to send a POST request with a JSON payload using the YOP Go SDK. It sets up the `YopRequest` and assigns a JSON string generated from a map to the `Content` field.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_6
+
+LANGUAGE: Go
+CODE:
+```
+var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+yopRequest.AppId = "appId"
+yopRequest.IsvPriKey = priKey
+// Set JSON request payload
+var params = map[string]any{}
+params["merchantId"] = "1595815987915711"
+params["requestId"] = "requestId"
+yopRequest.Content = utils.ParseToJsonStr(params)
+
+yopResp, err := client.DefaultClient.Request(yopRequest)
+if nil != err{ 
+    // request failed
+}
+//yopResp.Result is the request result
+```
+
+----------------------------------------
+
+TITLE: Install YOP Go SDK
+DESCRIPTION: This snippet shows how to install the YOP Go SDK using Go modules. Run this command in your terminal to add the SDK to your project.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_0
+
+LANGUAGE: Bash
+CODE:
+```
+go get github.com/yop-platform/yop-go-sdk
+```
+
+----------------------------------------
+
+TITLE: Configure YOP Go SDK Server Root for Different Environments
+DESCRIPTION: Provides examples of setting the ServerRoot for production, test, and YOS file service environments in the YOP Go SDK.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/examples/README.md#_snippet_5
+
+LANGUAGE: Go
+CODE:
+```
+// Production (default)
+yopRequest.ServerRoot = "https://openapi.yeepay.com/yop-center"
+
+// Test environment
+yopRequest.ServerRoot = "https://ycetest.yeepay.com:30228/yop-center"
+
+// YOS file service
+yopRequest.ServerRoot = "https://yos.yeepay.com/yop-center"
+```
+
+----------------------------------------
+
+TITLE: Configure YOP SDK Server Environment
+DESCRIPTION: Demonstrates how to configure the YOP Go SDK to connect to different environments, including production, test, and YOS file services, by setting the `ServerRoot` property.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_16
+
+LANGUAGE: go
+CODE:
+```
+// Production environment (default)
+yopRequest.ServerRoot = "https://openapi.yeepay.com/yop-center"
+
+// Test environment
+yopRequest.ServerRoot = "https://ycetest.yeepay.com:30228/yop-center"
+
+// YOS file service
+yopRequest.ServerRoot = "https://yos.yeepay.com/yop-center"
+```
+
+----------------------------------------
+
+TITLE: Signing Data with YOP SDK Go
+DESCRIPTION: This snippet demonstrates how to sign arbitrary data using the ISV's private key and the RSA SHA256 algorithm with Base64 encoding, utilizing the utils.RsaSignBase64 function provided by the SDK.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/llms.txt#_snippet_2
+
+LANGUAGE: Go
+CODE:
+```
+//utils.RsaSignBase64
+
+// 此处为测试数据，正式使用是请使用真实的私钥
+var priKey = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDBHBdHbQXsPT+EpAhLA9k2Q5O8GLCAUFLWYB57Uhc4ZNa2YUhjrTFvFZMFQuMjaVgdmFGTvqfGYUQBRldHFhf9kuXf5LPb+m0BJ/R5AWCyTcX7DHouoGODMfxkCZrimILwYWDkwhYTHr5hEV58nGRQtHOIVB5a4i/y4Z1vvX1MIjA+8OJ3zpaxXKkj+46OtfmjloUPGFSzz+rqq0UbTKmHjy5FmdCfgpiFzNSsJf5IGFKv2BkmMvUOb06IzfVgSs5O3rjqAnLFrUawUMrHcjN8gz144Z18extJ4dO4UlIfqzA2e2bLdJVUKJf+5D18zcIenlJkRmPZX67iDEuZINcnQIDAQABECgoAD4yQf0rTCEOiQq7mkAu+SLVGRwYB6EMPeH2C1tE0V3EfLM5GgugmK9ij3u+U1HweATwLjYbzgXDBhgzA6FNqGRvj8JQ8u0C92DL8Z2XqAFFs2JsXl3uIp761oOR5GTfIi0x7/c928ZEvKSe54PTCyxDMoLSNQSonTDpIb//k/+U4xEOQ1mjlSvlOM5ic7/kdw+G+aP/Hk/T6kg/vIblWQHx8SB3WYpLb/R6oPO+05X+zcQ+vVX1TrQ/amDp6/PouWjTF5hf48JEBdM8+xJzUwnalrG9U7pChfyGAOXQT1fbDdywBJXt6pZsT/mz1RkUC5Uto5/aVQGIDD+IPm/ZDbQgoAGDEwF09sjUb5hHEdmG28RmMf4E0JCOEzCvxiUpovobymqapLM5bf2oLNXqGenEAMbfFQatJFVKx6YBZwFIj/xzQJt8fL/jRzlbLijaANP+1JacvTsfXKBXS888FN3rkKisTlhmYXI+4EwA1wbcRkLDH3vezdVCi9cszQ9HvwkVfOwgoAD7QvzD3pirXIJ64JizWTS4MJMko3CWepsq9UZ5uyoHWh7tSz86H/2y0FK10YpJEJeGtyPXlnU+uQwjYMJRPLlNv8180pjCJX2ZTW2drB2vOJvormhMhDIYAZtPAHu2dajzdy4VRuvFTtH4FpW/KjAJrTLK3ze3K95ACYVBJ8EmBwgoADQK8DiNN724hmLjvqTMjiLpJ19U/lE5+jqbM3qmtTDWl0ddr9BdzH9/E2kKZefLbv8VJH2TQjO07hdRhk599/jZ5BGseSQvOyysaEMgj6ZjunwHOwSNjDspdiOk/uTzPIyVmY2eDDD1zRAiWi2jmBTI2vOIm7CSa75TgofLu4XFAoABJrFM4+vYNlFXbY0/LqU+21ttmV+K471rPj0Jto7GPNhZs6CaEr0g8COpDQNA6JoDv5Td0eIDWZ6c+ii5G9H+VjUCc6WprQIhepVkGzsJUjWlOrp66MeVwEElFdAk/PbXBvEUOWYTwi1uY6Y0trzMK31OvFOODKjWf6WHrf4tfgnAoABOri6bX2D/zqpJT3mJ5MIVJJbn4D4Idx+TCUaVRSY1rBp+Y2ofW1W8ktu7xPO9/LwVQR7kJeosEBAFGTmGqll033ywu5+8X8J1bw6HCghkI0yHW752sOdfl30kXi3Ds8tQsvSEHRfnPb8yvWve2srZb9ubwOvpI0PtOIujZP4fYI="
+var content = "a=123！@#¥%……中文"
+signature, error := utils.RsaSignBase64(content, priKey, crypto.SHA256)
+if nil != error {
+	//sign error
+}
+```
+
+----------------------------------------
+
+TITLE: Generate RSA Signature in Go
+DESCRIPTION: Provides an example of generating an RSA signature using `utils.RsaSignBase64`. It takes the content to be signed, the private key, and the hashing algorithm (SHA256) as input. The function returns the base64 encoded signature.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_10
+
+LANGUAGE: go
+CODE:
+```
+//utils.RsaSignBase64
+
+// This is test data, please use the real private key for production
+var priKey = "<Private Key Text>"
+var content = "a=123！@#¥%……Chinese"
+signature, error := utils.RsaSignBase64(content, priKey, crypto.SHA256)
+if nil != error {
+    //sign error
+}
+```
+
+----------------------------------------
+
+TITLE: Decrypting YOP Callback Content Go
+DESCRIPTION: This code demonstrates how to decrypt content received in a callback from the Yeepay platform using the utils.DecryptCallback function. It requires the platform's public key, the ISV's private key, and the encrypted callback string as inputs.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/llms.txt#_snippet_5
+
+LANGUAGE: Go
+CODE:
+```
+//utils.DecryptCallback
+
+  var callback = "Ars6jASSiylO70_VJDQ5SFU1zQwaI36kG5WhlSKHjkGdU3fEVEkkbhvAxKjOTUiw9vF7RMnmGKQQWAuV8jCKaOpMNjIEMHehBaPASwTiEE946CcbOeoNILGHf0o20xj2gqqvkQToFXEMNiic7bcYbfi0PxIrR6loBZnW-m5bqzB5RXLibiSjGlmr5CDnxV4tZXmYlkkeN2BcT4msWjfCtuaTMK_fN77WJcCMlW7ffqiN5yIOeqB4QBb5lOnClTRW4DThKPOMkXupAM2AnPxTkDp4n9lh-SK56zLuafk1bQhWUNcS9L4YEKZGJIjP7DY20TAWEr3yXo8w0w0VtB13Ig$Xf6fETKWcLTudBh2HluGSQTqhBRJa6EXHhXlMryWW8Y384jVwIfpQm19RmTgkoqRc2tNcTWxRIW6itIS62DrzixlqRa099jx21uGqt8FCpvdWwnwlC16SgkeU_5NnrpjA_WQ0XW9RhNxzuQmwfxHGbtnth4vNXWswcSm23j3KQaXjVP5Ws1uYVCxYSLMxqJE7a56DNWONGcGJJsc0KTCc7cdfr8n24emAaPCNteIG2RM8F17pRxY5yVnguTSZPXmhBlyI25xS7rciWzKZLp2Kfh_JCivABbA-_5Vf3VWPmjITs-TR5HlGVFbnT0eOUMUepXUemjjP8R0f8cBeH2NKej6QjQL99tvrrxg_QfmezE0WTCITCNDBhpbHiq90lFyLjwlWNDTRo8rhjouSlMA9Ae_b-B4eZorDRRxw3BWywdyo2FzNk-dUDeBVaIth9YsaMGsqvXivGjlnnx3YEVfEtuVSvEm1xBdYsTHcM02nMwZb8Ze2WL1kIFo8IFM0$AES$SHA256"
+  // 此处为测试数据，正式使用是请使用真实的平台公钥
+  var platformPubKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7LqdMV7ZeOWUwVp0duSucTr4VwUNHtYLlWEUWlBtDQDEPhx0WZZdw2DxEbQqMQM5BjXZACYlhEdPt0HicDthOIUeUt8JNcvgq06vIE958RzgVBa5z3zvMLYWJIZaUyxsxC7Us06eNiB+du0rEBxUckru41ZSu/DX9jssFC+l5459b3WWELNf2fXqJyfb4f8GuGk8enXgJdxBUcmwgaEQxJjWkPqhzSiRy9GKjcXBdCkzCYR4xmLkHe6K0YFiBxax7lOni3zVOsvHC9XdhbepwB9fMkHbZXS/LJf5aS5ltendObpVrAD9kck7bIQzsrM49/SG/dYmbtm139I6ygsCzQIDAQAB"
+  var isvPriKey = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDBHBdHbQXsPT+EpAhLA9k2Q5O8GLCAUFLWYB57Uhc4ZNa2YUhjrTFvFZMFQuMjaVgdmFGTvqfGYUQBRldHFhf9kuXf5LPb+m0BJ/R5AWCyTcX7DHouoGODMfxkCZrimILwYWDkwhYTHr5hEV58nGRQtHOIVB5a4i/y4Z1vvX1MIjA+8OJ3zpaxXKkj+46OtfmjloUPGFSzz/rqq0UbTKmHjy5FmdCfgpiFzNSsJf5IGFKv2BkmMvUOb06IzfVgSs5O3rjqAnLFrUawUMrHcjN8gz144Z18extJ4dO4UlIfqzA2e2bLdJVUKJf+5D18zcIenlJkRmPZX67iDEuZINcnQIDAQABECgoAD4yQf0rTCEOiQq7mkAu+SLVGRwYB6EMPeH2C1tE0V3EfLM5GgugmK9ij3u+U1HweATwLjYbzgXDBhgzA6FNqGRvj8JQ8u0C92DL8Z2XqAFFs2JsXl3uIp761oOR5GTfIi0x7/c928ZEvKSe54PTCyxDMoLSNQSonTDpIb//k/+U4xEOQ1mjlSvlOM5ic7/kdw+G+aP/Hk/T6kg/vIblWQHx8SB3WYpLb/R6oPO+05X+zcQ+vVX1TrQ/amDp6/PouWjTF5hf48JEBdM8+xJzUwnalrG9U7pChfyGAOXQT1fbDdywBJXt6pZsT/mz1RkUC5Uto5/aVQGIDD+IPm/ZDbQgoAGDEwF09sjUb5hHEdmG28RmMf4E0JCOEzCvxiUpovobymqapLM5bf2oLNXqGenEAMbfFQatJFVKx6YBZwFIj/xzQJt8fL/jRzlbLijaANP+1JacvTsfXKBXS888FN3rkKisTlhmYXI+4EwA1wbcRkLDH3vezdVCi9cszQ9HvwkVfOwgoAD7QvzD3pirXIJ64JizWTS4MJMko3CWepsq9UZ5uyoHWh7tSz86H/2y0FK10YpJEJeGtyPXlnU+uQwjYMJRPLlNv8180pjCJX2ZTW2drB2vOJvormhMhDIYAZtPAHu2dajzdy4VRuvFTtH4FpW/KjAJrTLK3ze3K95ACYVBJ8EmBwgoADQK8DiNN724hmLjvqTMjiLpJ19U/lE5+jqbM3qmtTDWl0ddr9BdzH9/E2kKZefLbv8VJH2TQjO07hdRhk599/jZ5BGseSQvOyysaEMgj6ZjunwHOwSNjDspdiOk/uTzPIyVmY2eDDD1zRAiWi2jmBTI2vOIm3CSa75TgofLu4XFAoABJrFM4+vYNlFXbY0/LqU+21ttmV+K471rPj0Jto7GPM4Zs6CaEr0g8COpDQNA6JoDv5Td0eIDWZ6c+ii5G9H+VjUCc6WprQIhepVkGzsJUjWlOrp66MeVwEElFdAk/PbXBvEUOWYTwi1uY6Y0trzMK31OvFOODKjWf6WHrf4tfgnAoABOri6bX2D/zqpJT3mJ5MIVJJbn4D4Idx+TCUaVRSY1rBp+Y2ofW1W8ktu7xPO9/LwVQR7kJeosEBAFGTmGqll033ywu5+8X8J1bw6HCghkI0yHW752sOdfl30kXi3Ds8tQsvSEHRfnPb8yvWve2srZb9ubwOvpI0PtOIujZP4fYI="
+
+  content, err := utils.DecryptCallback(platformPubKey, isvPriKey, callback)
+  if nil != err {
+	  //"decrypt failed"
+  }
+```
+
+----------------------------------------
+
+TITLE: Decrypt Callback Content in Go
+DESCRIPTION: Shows how to decrypt callback content using `utils.DecryptCallback`. This function requires the platform public key, the ISV private key, and the encrypted callback string. It returns the decrypted content or an error.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_9
+
+LANGUAGE: go
+CODE:
+```
+//utils.DecryptCallback
+
+var callback = "Ars6jASSiylO70_VJDQ5SFU1zQwaI36kG5WhlSKHjkGdU3fEVEkkbhvAxKjOTUiw9vF7RMnmGKQQWAuV8jCKaOpMNjIEMHehBaPASwTiEE946CcbOeoNILGHf0o20xj2gqqvkQToFXEMNiic7bcYbfi0PxIrR6loBZnW-m5bqzB5RXLibiSjGlmr5CDnxV4tZXmYlkkeN2BcT4msWjfCtuaTMK_fN77WJcCMlW7ffqiN5yIOeqB4QBb5lOnClTRW4DThKPOMkXupAM2AnPxTkDp4n9lh-SK56zLuafk1bQhWUNcS9L4YEKZGJIjP7DY20TAWEr3yXo8w0w0VtB13Ig$Xf6fETKWcLTudBh2HluGSQTqhBRJa6EXHhXlMryWW8Y384RjVwIfpQm19RmTgkoqRc2tNcTWxRIW6itIS62DrzixlqRa099jx21uGqt8FCpvdWwnwlC16SgkeU_5NnrpjA_WQ0XW9RhNxzuQmwfxHGbtnth4vNXWswcSm23j3KQaXFjVP5Ws1uYVCxYSLMxqJE7a56DNWONGcGJJsc0KTCc7cdfr8n24emAaPCNteIG2RM8B17pRxY5yVnguTSZPXmhBlyI25xS7rciWzKZLp2Kfh_JCivABbA-_5V3VWPmjITs-TR5HlGVFbnT0eOUMUepXUemjjP8R0f8cBeH2NKej6QjQL99tvlrrxg_QfmezE0WTCITCNDBhpbHiq90lFyLjwlWNDTRo8rhjouSlMA9Ae_b-B4eZorDRVxw3BWywdyo2FzNk-dUDeBVaIth9YsaMGsq9XivGjlnnx3YEVfEtuVSvEm1xBdYsTHcM02nMwZb8Ze2WL1kIFo8IFM0$AES$SHA256"
+// This is test data, please use the real platform public key for production
+var platformPubKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7LqdMV7ZeOWUwVp0duSucTr4VwUNHtYLlWEUWlBtDQDEPhx0WZZdwzDxEbQqMQM5BjXZACYlhEdPt0HicDthOIUeUt8JNcvgq06vIE958RzgVBa5z3zvMLYWJIZaUyxsxC7Us06eNiB+du0rEBxUckru41ZSu/DX9jssFC+l5459b3WWELNf2fXqJyfb4f8GuGk8enXgJdxBUcmwgaEQxJjWkPqhzSiRy9GKjcXBdCkzCYR4xmLkHe6K0YFiBxax7lOni3zVOsvHC9XdhbepwB9fMkHbZXS/LJf5aS5ltendObpVrAD9kck7bIQzsrM49/SG/dYmbtm139I6ygsCzQIDAQAB"
+var isvPriKey = "<Private Key Text>"
+
+content, err := utils.DecryptCallback(platformPubKey, isvPriKey, callback)
+if nil != err {
+    //"decrypt failed"
+}
+```
+
+----------------------------------------
+
+TITLE: Verify YOP Platform Signature in Go
+DESCRIPTION: This Go code snippet demonstrates how to verify a digital signature using the `utils.VerifySign` function. It takes the original data, the signature string, the public key, and the hashing algorithm (SHA256) as inputs to check the integrity and authenticity of the data. The example includes sample public key, signature, and data.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/llms.txt#_snippet_4
+
+LANGUAGE: Go
+CODE:
+```
+var pubKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwRwXR20F7D0/hKQISwPZNkOTvBiwgFBS1mAee1IXOGTWtmFIY60xbxWTBULjI2lYHZhRk76nxmFEAUZXRxYX/ZLl3+Sz2/ptASf0eQFgsk3F+wx6LqBjgzH8ZAma4piC8GFw5MIWEx6+YRFefJxkULRziFQeWuIv8uGdb719TCIwPvDid86WsVypI/uOjrX5o5aFDxhUs8/q6q0UbTKmHjy5FmdCfgpiFzNSsJf5IGFKv2BkmMvUOb06IzfVgSs5O3rjqAnLFrUawUMrHcjN8gz144Z18extJ4dO4UlIfqzA2e2bLdJVUKJf+5D18zcIenlJkRmPZX67iDEuZINcnQIDAQAB"
+var signature = "glTZg6lLl6oV4Ho15fAUegcVILlTwYJkbZO_Iz8AYUKTZ_1JP4AqAqSdm3GqjaukoNrDkxPGv2WW8plxYxtzsXjkzWiCMth5aShHgA7a9SXW0jfo365KPyVj0zFO2QIV9odHEnY1apwcAxvr54j4d5SHoC3vKUczZ20txTsNjcG9ifi1AoJhblILxKL2NO0tdIzTMQCRaBdOXUOdnL7RgP1qPew5yJT4e1QdtTjkirCKJurm4SumOA3Uroz-G-9MUZgiTkU4RXrEvu-rJPlqfJPsITYoWLsuPy1Gfne_5j-IgChXpoHacI0s-NlzKmyjsFt3-5aUYDd0cFw58ErUXw"
+var data = "{\"result\":{\"requestId\":\"requestId\",\"errorMsg\":\"exception.record.not.found.transferDomesticOrder|merchantId:[null],requestId:[requestId]\",\"status\":\"FAILED\"}}"
+if !utils.VerifySign(data, signature, pubKey, crypto.SHA256) {
+     //verify failed
+}
+```
+
+----------------------------------------
+
+TITLE: Verifying Signature with YOP SDK Go
+DESCRIPTION: This snippet shows how to verify a signature against a piece of data using the utils.VerifySign function. It requires the data, the signature string, the platform's public key, and the signing algorithm (crypto.SHA256) to check if the signature is valid.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/llms.txt#_snippet_3
+
+LANGUAGE: Go
+CODE:
+```
+//utils.VerifySign
+
+// 此处为测试数据
+```
+
+----------------------------------------
+
+TITLE: Verify RSA Signature in Go
+DESCRIPTION: Demonstrates how to verify an RSA signature using `utils.VerifySign`. This function checks the authenticity of data against a provided signature, public key, and hashing algorithm. It returns a boolean indicating verification success or failure.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_11
+
+LANGUAGE: go
+CODE:
+```
+//utils.VerifySign
+
+// This is test data
+var pubKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwRwXR20F7D0/hKQISwPZNkOTvBiwgFBS1mAee1IXOGTWtmFIY60xbxWTBULjI2lYHZhRk76nxmFEAUZXRxYX/ZLl3+Sz2/ptASf0eQFgsk3F+wx6LqBjgzH8ZAma4piC8GFg5MIWEx6+YRFefJxkULRziFQeWuIv8uGdb719TCIwPvDid86WsVypI/uOjrX5o5aFDxhUs8/q6q0UbTKmHjy5FmdCfgpiFzNSsJf5IGFKv2BkmMvUOb06IzfVgSs5O3rjqAnLFrUawUMrHcjN8gz144Z18extJ4dO4UlIfqzA2e2bLdJVUKJf+5D18zcIenlJkRmPZX67iDEuZINcnQIDAQAB"
+var signature = "glTZg6lLl6oV4Ho15fAUegcVILlTwYJkbZO_Iz8AYUKTZ_1JP4AqAqSdm3GqjaukoNrDkxPGv2WW8plxYxtzsXjkzWiCMth5aShHgA7a9SXW0jfo365KPyVj0zFO2QIV9odHEnY1apwcAxvr54j4d5SHoC3vKUczZ20txTsNjcG9ifi1AoJhblILxKL2NO0tdIzTMQCRaBdOXUOdnL7RgP1qPew5yJT4e1QdtTjkirCKJurm4SumOA3Uroz-G-9MUZgiTkU4RXrEvu-rJPlqfJPsITYoWLsuPy1Gfne_5j-IgChXpoHacI0s-NlzKmyjsFt3-5aUYDd0cFw58ErUXr"
+var data = "{\"result\":{\"requestId\":\"requestId\",\"errorMsg\":\"exception.record.not.found.transferDomesticOrder|merchantId:[null],requestId:[requestId]\",\"status\":\"FAILED\"}}"
+if !utils.VerifySign(data, signature, pubKey, crypto.SHA256) {
+     //verify failed
+}
+```
+
+----------------------------------------
+
+TITLE: Process Batch YOP SDK Requests Concurrently
+DESCRIPTION: Illustrates a Go function for processing multiple YOP SDK requests concurrently using a semaphore to limit the maximum number of parallel goroutines, ensuring efficient resource utilization.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_22
+
+LANGUAGE: go
+CODE:
+```
+func processBatchRequests(requests []*request.YopRequest) {
+    const maxConcurrency = 10
+    semaphore := make(chan struct{}, maxConcurrency)
+    var wg sync.WaitGroup
+
+    for _, req := range requests {
+        wg.Add(1)
+        go func(r *request.YopRequest) {
+            defer wg.Done()
+            semaphore <- struct{}{} // Acquire semaphore
+            defer func() { <-semaphore }() // Release semaphore
+
+            resp, err := client.DefaultClient.Request(r)
+            if err != nil {
+                log.Printf("Request failed: %v", err)
+                return
+            }
+            // Process response...
+        }(req)
+    }
+
+    wg.Wait()
+}
+```
+
+----------------------------------------
+
+TITLE: Mock YOP Go SDK Client for Testing
+DESCRIPTION: Illustrates how to create a mock client for the YOP Go SDK to facilitate testing without making actual API calls.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/examples/README.md#_snippet_6
+
+LANGUAGE: Go
+CODE:
+```
+// Create a mock client for testing
+mockClient := &MockYopClient{}
+yopResp, err := mockClient.Request(yopRequest)
+```
+
+----------------------------------------
+
+TITLE: Add Custom Headers to YOP Go SDK Request
+DESCRIPTION: Shows how to include custom HTTP headers in a YOP Go SDK request by modifying the Headers map.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/examples/README.md#_snippet_4
+
+LANGUAGE: Go
+CODE:
+```
+yopRequest.Headers["Custom-Header"] = "custom-value"
+```
+
+----------------------------------------
+
+TITLE: Set Custom Timeout for YOP Go SDK Request
+DESCRIPTION: Demonstrates how to configure a custom timeout duration for a YOP Go SDK request using the Timeout property.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/examples/README.md#_snippet_3
+
+LANGUAGE: Go
+CODE:
+```
+yopRequest := request.NewYopRequest(constants.GET_HTTP_METHOD, "/api/path")
+yopRequest.Timeout = 30 * time.Second // Custom timeout
+```
+
+----------------------------------------
+
+TITLE: Configure Logging for YOP Go SDK
+DESCRIPTION: Shows how to customize the logging behavior of the YOP Go SDK, including setting a custom log output destination and disabling log output entirely using `io.Discard`.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_18
+
+LANGUAGE: go
+CODE:
+```
+import (
+    "log"
+    "os"
+    "github.com/yop-platform/yop-go-sdk/yop/utils"
+)
+
+// Custom log output
+utils.Logger = log.New(os.Stdout, "YOP-SDK: ", log.LstdFlags)
+
+// Disable log output
+utils.Logger = log.New(io.Discard, "", 0)
+```
+
+----------------------------------------
+
+TITLE: Optimize HTTP Connection Pool for YOP SDK
+DESCRIPTION: Shows how to configure the `http.Transport` to optimize connection pooling parameters like `MaxIdleConns`, `MaxIdleConnsPerHost`, and `IdleConnTimeout` for improved performance of HTTP requests.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_21
+
+LANGUAGE: go
+CODE:
+```
+// Optimize HTTP transport configuration
+transport := &http.Transport{
+    MaxIdleConns:        100,
+    MaxIdleConnsPerHost: 10,
+    IdleConnTimeout:     90 * time.Second,
+    TLSHandshakeTimeout: 10 * time.Second,
+}
+
+customClient := &http.Client{
+    Transport: transport,
+    Timeout:   30 * time.Second,
+}
+```1) * time.Second) // Exponential backoff
+        }
+    }
+
+    return nil, fmt.Errorf("request failed after %d retries: %v", maxRetries, lastErr)
+}
+```
+
+----------------------------------------
+
+TITLE: Configure YOP Go SDK Request
+DESCRIPTION: This example demonstrates how to configure a YOP request in Go. It sets the application's private key, AppId, and an optional request timeout. The `YopRequest` object is central to all API interactions.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_2
+
+LANGUAGE: Go
+CODE:
+```
+var priKey = request.IsvPriKey{Value: "Your private key content", CertType: request.RSA2048}
+var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/api/path")
+yopRequest.AppId = "Your AppId"
+yopRequest.IsvPriKey = priKey
+yopRequest.Timeout = 15 * time.Second // Set timeout to 15 seconds (optional)
+```
+
+----------------------------------------
+
+TITLE: Making POST JSON Request with YOP SDK Go
+DESCRIPTION: This snippet shows how to send a POST request with a JSON request body. Instead of using AddParam, the JSON content is generated from a map using utils.ParseToJsonStr and assigned to the yopRequest.Content field before the request is executed.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/llms.txt#_snippet_1
 
 LANGUAGE: Go
 CODE:
@@ -46,9 +552,85 @@ if nil != err{
 
 ----------------------------------------
 
+TITLE: Perform YOP Go SDK POST JSON Request
+DESCRIPTION: This Go example demonstrates how to send a POST request with a JSON payload using the YOP Go SDK. It sets up the `YopRequest` and assigns a JSON string generated from a map to the `Content` field.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_6
+
+LANGUAGE: Go
+CODE:
+```
+var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+yopRequest.AppId = "appId"
+yopRequest.IsvPriKey = priKey
+// Set JSON request payload
+var params = map[string]any{}
+params["merchantId"] = "1595815987915711"
+params["requestId"] = "requestId"
+yopRequest.Content = utils.ParseToJsonStr(params)
+
+yopResp, err := client.DefaultClient.Request(yopRequest)
+if nil != err{ 
+    // request failed
+}
+//yopResp.Result is the request result
+```
+
+----------------------------------------
+
+TITLE: Install YOP Go SDK
+DESCRIPTION: This snippet shows how to install the YOP Go SDK using Go modules. Run this command in your terminal to add the SDK to your project.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_0
+
+LANGUAGE: Bash
+CODE:
+```
+go get github.com/yop-platform/yop-go-sdk
+```
+
+----------------------------------------
+
+TITLE: Configure YOP Go SDK Server Root for Different Environments
+DESCRIPTION: Provides examples of setting the ServerRoot for production, test, and YOS file service environments in the YOP Go SDK.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/examples/README.md#_snippet_5
+
+LANGUAGE: Go
+CODE:
+```
+// Production (default)
+yopRequest.ServerRoot = "https://openapi.yeepay.com/yop-center"
+
+// Test environment
+yopRequest.ServerRoot = "https://ycetest.yeepay.com:30228/yop-center"
+
+// YOS file service
+yopRequest.ServerRoot = "https://yos.yeepay.com/yop-center"
+```
+
+----------------------------------------
+
+TITLE: Configure YOP SDK Server Environment
+DESCRIPTION: Demonstrates how to configure the YOP Go SDK to connect to different environments, including production, test, and YOS file services, by setting the `ServerRoot` property.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_16
+
+LANGUAGE: go
+CODE:
+```
+// Production environment (default)
+yopRequest.ServerRoot = "https://openapi.yeepay.com/yop-center"
+
+// Test environment
+yopRequest.ServerRoot = "https://ycetest.yeepay.com:30228/yop-center"
+
+// YOS file service
+yopRequest.ServerRoot = "https://yos.yeepay.com/yop-center"
+```
+
+----------------------------------------
+
 TITLE: Signing Data with YOP SDK Go
 DESCRIPTION: This snippet demonstrates how to sign arbitrary data using the ISV's private key and the RSA SHA256 algorithm with Base64 encoding, utilizing the utils.RsaSignBase64 function provided by the SDK.
-SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_7
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/llms.txt#_snippet_2
 
 LANGUAGE: Go
 CODE:
@@ -56,7 +638,7 @@ CODE:
 //utils.RsaSignBase64
 
 // 此处为测试数据，正式使用是请使用真实的私钥
-var priKey = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDBHBdHbQXsPT+EpAhLA9k2Q5O8GLCAUFLWYB57Uhc4ZNa2YUhjrTFvFZMFQuMjaVgdmFGTvqfGYUQBRldHFhf9kuXf5LPb+m0BJ/R5AWCyTcX7DHouoGODMfxkCZrimILwYWDkwhYTHr5hEV58nGRQtHOIVB5a4i/y4Z1vvX1MIjA+8OJ3zpaxXKkj+46OtfmjloUPGFSzz+rqq0UbTKmHjy5FmdCfgpiFzNSsJf5IGFKv2BkmMvUOb06IzfVgSs5O3rjqAnLFrUawUMrHcjN8gz144Z18extJ4dO4UlIfqzA2e2bLdJVUKJf+5D18zcIenlJkRmPZX67iDEuZINcnQIDAQABECgoAD4yQf0rTCEOiQq7mkAu+SLVGRwYB6EMPeH2C1tE0V3EfLM5GgugmK9ij3u+U1HweATwLjYbzgXDBhgzA6FNqGRvj8JQ8u0C92DL8Z2XqAFFs2JsXl3uIp761oOR5GTfIi0x7/c928ZEvKSe54PTCyxDMoLSNQSonTDpIb//k/+U4xEOQ1mjlSvlOM5ic7/kdw+G+aP/Hk/T6kg/vIblWQHx8SB3WYpLb/R6oPO+05X+zcQ+vVX1TrQ/amDp6/PouWjTF5hf48JEBdM8+xJzUwnalrG9U7pChfyGAOXQT1fbDdywBJXt6pZsT/mz1RkUC5Uto5/aVQGIDD+IPm/ZDbQgoAGDEwF09sjUb5hHEdmG28RmMf4E0JCOEzCvxiUpovobymqapLM5bf2oLNXqGenEAMbfFQatJFVKx6YBZwFIj/xzQJt8fL/jRzlbLijaANP+1JacvTsfXKBXS888FN3rkKisTlhmYXI+4EwA1wbcRkLDH3vezdVCi9cszQ9HvwkVfOwgoAD7QvzD3pirXIJ64JizWTS4MJMko3CWepsq9UZ5uyoHWh7tSz86H/2y0FK10YpJEJeGtyPXlnU+uQwjYMJRPLlNv8180pjCJX2ZTW2drB2vOJvormhMhDIYAZtPAHu2dajzdy4VRuvFTtH4FpW/KjAJrTLK3ze3K95ACYVBJ8EmBwgoADQK8DiNN724hmLjvqTMjiLpJ19U/lE5+jqbM3qmtTDWl0ddr9BdzH9/E2kKZefLbv8VJH2TQjO07hdRhk599/jZ5BGseSQvOyysaEMgj6ZjunwHOwSNjDspdiOk/uTzPIyVmY2eDDD1zRAiWi2jmBTI2vOIm7CSa75TgofLu4XFAoABJrFM4+vYNlFXbY0/LqU+21ttmV+K471rPj0Jto7GPN4Zs6CaEr0g8COpDQNA6JoDv5Td0eIDWZ6c+ii5G9H+VjUCc6WprQIhepVkGzsJUjWlOrp66MeVwEElFdAk/PbXBvEUOWYTwi1uY6Y0trzMK31OvFOODKjWf6WHrf4tfgnAoABOri6bX2D/zqpJT3mJ5MIVJJbn4D4Idx+TCUaVRSY1rBp+Y2ofW1W8ktu7xPO9/LwVQR7kJeosEBAFGTmGqll033ywu5+8X8J1bw6HCghkI0yHW752sOdfl30kXi3Ds8tQsvSEHRfnPb8yvWve2srZb9ubwOvpI0PtOIujZP4fYI="
+var priKey = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDBHBdHbQXsPT+EpAhLA9k2Q5O8GLCAUFLWYB57Uhc4ZNa2YUhjrTFvFZMFQuMjaVgdmFGTvqfGYUQBRldHFhf9kuXf5LPb+m0BJ/R5AWCyTcX7DHouoGODMfxkCZrimILwYWDkwhYTHr5hEV58nGRQtHOIVB5a4i/y4Z1vvX1MIjA+8OJ3zpaxXKkj+46OtfmjloUPGFSzz+rqq0UbTKmHjy5FmdCfgpiFzNSsJf5IGFKv2BkmMvUOb06IzfVgSs5O3rjqAnLFrUawUMrHcjN8gz144Z18extJ4dO4UlIfqzA2e2bLdJVUKJf+5D18zcIenlJkRmPZX67iDEuZINcnQIDAQABECgoAD4yQf0rTCEOiQq7mkAu+SLVGRwYB6EMPeH2C1tE0V3EfLM5GgugmK9ij3u+U1HweATwLjYbzgXDBhgzA6FNqGRvj8JQ8u0C92DL8Z2XqAFFs2JsXl3uIp761oOR5GTfIi0x7/c928ZEvKSe54PTCyxDMoLSNQSonTDpIb//k/+U4xEOQ1mjlSvlOM5ic7/kdw+G+aP/Hk/T6kg/vIblWQHx8SB3WYpLb/R6oPO+05X+zcQ+vVX1TrQ/amDp6/PouWjTF5hf48JEBdM8+xJzUwnalrG9U7pChfyGAOXQT1fbDdywBJXt6pZsT/mz1RkUC5Uto5/aVQGIDD+IPm/ZDbQgoAGDEwF09sjUb5hHEdmG28RmMf4E0JCOEzCvxiUpovobymqapLM5bf2oLNXqGenEAMbfFQatJFVKx6YBZwFIj/xzQJt8fL/jRzlbLijaANP+1JacvTsfXKBXS888FN3rkKisTlhmYXI+4EwA1wbcRkLDH3vezdVCi9cszQ9HvwkVfOwgoAD7QvzD3pirXIJ64JizWTS4MJMko3CWepsq9UZ5uyoHWh7tSz86H/2y0FK10YpJEJeGtyPXlnU+uQwjYMJRPLlNv8180pjCJX2ZTW2drB2vOJvormhMhDIYAZtPAHu2dajzdy4VRuvFTtH4FpW/KjAJrTLK3ze3K95ACYVBJ8EmBwgoADQK8DiNN724hmLjvqTMjiLpJ19U/lE5+jqbM3qmtTDWl0ddr9BdzH9/E2kKZefLbv8VJH2TQjO07hdRhk599/jZ5BGseSQvOyysaEMgj6ZjunwHOwSNjDspdiOk/uTzPIyVmY2eDDD1zRAiWi2jmBTI2vOIm7CSa75TgofLu4XFAoABJrFM4+vYNlFXbY0/LqU+21ttmV+K471rPj0Jto7GPNhZs6CaEr0g8COpDQNA6JoDv5Td0eIDWZ6c+ii5G9H+VjUCc6WprQIhepVkGzsJUjWlOrp66MeVwEElFdAk/PbXBvEUOWYTwi1uY6Y0trzMK31OvFOODKjWf6WHrf4tfgnAoABOri6bX2D/zqpJT3mJ5MIVJJbn4D4Idx+TCUaVRSY1rBp+Y2ofW1W8ktu7xPO9/LwVQR7kJeosEBAFGTmGqll033ywu5+8X8J1bw6HCghkI0yHW752sOdfl30kXi3Ds8tQsvSEHRfnPb8yvWve2srZb9ubwOvpI0PtOIujZP4fYI="
 var content = "a=123！@#¥%……中文"
 signature, error := utils.RsaSignBase64(content, priKey, crypto.SHA256)
 if nil != error {
@@ -66,17 +648,78 @@ if nil != error {
 
 ----------------------------------------
 
-TITLE: Verifying Signature with YOP SDK Go
-DESCRIPTION: This snippet shows how to verify a signature against a piece of data using the utils.VerifySign function. It requires the data, the signature string, the platform's public key, and the signing algorithm (crypto.SHA256) to check if the signature is valid.
-SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_8
+TITLE: Generate RSA Signature in Go
+DESCRIPTION: Provides an example of generating an RSA signature using `utils.RsaSignBase64`. It takes the content to be signed, the private key, and the hashing algorithm (SHA256) as input. The function returns the base64 encoded signature.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_10
+
+LANGUAGE: go
+CODE:
+```
+//utils.RsaSignBase64
+
+// This is test data, please use the real private key for production
+var priKey = "<Private Key Text>"
+var content = "a=123！@#¥%……Chinese"
+signature, error := utils.RsaSignBase64(content, priKey, crypto.SHA256)
+if nil != error {
+    //sign error
+}
+```
+
+----------------------------------------
+
+TITLE: Decrypting YOP Callback Content Go
+DESCRIPTION: This code demonstrates how to decrypt content received in a callback from the Yeepay platform using the utils.DecryptCallback function. It requires the platform's public key, the ISV's private key, and the encrypted callback string as inputs.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/llms.txt#_snippet_5
 
 LANGUAGE: Go
 CODE:
 ```
-//utils.VerifySign
+  //utils.DecryptCallback
 
-// 此处为测试数据
-vvar pubKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwRwXR20F7D0/hKQISwPZNkOTvBiwgFBS1mAee1IXOGTWtmFIY60xbxWTBULjI2lYHZhRk76nxmFEAUZXRxYX/ZLl3+Sz2/ptASf0eQFgsk3F+wx6LqBjgzH8ZAma4piC8GFw5MIWEx6+YRFefJxkULRziFQeWuIv8uGdb719TCIwPvDid86WsVypI/uOjrX5o5aFDxhUs8/q6q0UbTKmHjy5FmdCfgpiFzNSsJf5IGFKv2BkmMvUOb06IzfVgSs5O3rjqAnLFrUawUMrHcjN8gz144Z18extJ4dO4UlIfqzA2e2bLdJVUKJf+5D18zcIenlJkRmPZX67iDEuZINcnQIDAQAB"
+  var callback = "Ars6jASSiylO70_VJDQ5SFU1zQwaI36kG5WhlSKHjkGdU3fEVEkkbhvAxKjOTUiw9vF7RMnmGKQQWAuV8jCKaOpMNjIEMHehBaPASwTiEE946CcbOeoNILGHf0o20xj2gqqvkQToFXEMNiic7bcYbfi0PxIrR6loBZnW-m5bqzB5RXLibiSjGlmr5CDnxV4tZXmYlkkeN2BcT4msWjfCtuaTMK_fN77WJcCMlW7ffqiN5yIOeqB4QBb5lOnClTRW4DThKPOMkXupAM2AnPxTkDp4n9lh-SK56zLuafk1bQhWUNcS9L4YEKZGJIjP7DY20TAWEr3yXo8w0w0VtB13Ig$Xf6fETKWcLTudBh2HluGSQTqhBRJa6EXHhXlMryWW8Y384jVwIfpQm19RmTgkoqRc2tNcTWxRIW6itIS62DrzixlqRa099jx21uGqt8FCpvdWwnwlC16SgkeU_5NnrpjA_WQ0XW9RhNxzuQmwfxHGbtnth4vNXWswcSm23j3KQaXjVP5Ws1uYVCxYSLMxqJE7a56DNWONGcGJJsc0KTCc7cdfr8n24emAaPCNteIG2RM8F17pRxY5yVnguTSZPXmhBlyI25xS7rciWzKZLp2Kfh_JCivABbA-_5Vf3VWPmjITs-TR5HlGVFbnT0eOUMUepXUemjjP8R0f8cBeH2NKej6QjQL99tvrrxg_QfmezE0WTCITCNDBhpbHiq90lFyLjwlWNDTRo8rhjouSlMA9Ae_b-B4eZorDRRxw3BWywdyo2FzNk-dUDeBVaIth9YsaMGsqvXivGjlnnx3YEVfEtuVSvEm1xBdYsTHcM02nMwZb8Ze2WL1kIFo8IFM0$AES$SHA256"
+  // 此处为测试数据，正式使用是请使用真实的平台公钥
+  var platformPubKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7LqdMV7ZeOWUwVp0duSucTr4VwUNHtYLlWEUWlBtDQDEPhx0WZZdw2DxEbQqMQM5BjXZACYlhEdPt0HicDthOIUeUt8JNcvgq06vIE958RzgVBa5z3zvMLYWJIZaUyxsxC7Us06eNiB+du0rEBxUckru41ZSu/DX9jssFC+l5459b3WWELNf2fXqJyfb4f8GuGk8enXgJdxBUcmwgaEQxJjWkPqhzSiRy9GKjcXBdCkzCYR4xmLkHe6K0YFiBxax7lOni3zVOsvHC9XdhbepwB9fMkHbZXS/LJf5aS5ltendObpVrAD9kck7bIQzsrM49/SG/dYmbtm139I6ygsCzQIDAQAB"
+  var isvPriKey = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDBHBdHbQXsPT+EpAhLA9k2Q5O8GLCAUFLWYB57Uhc4ZNa2YUhjrTFvFZMFQuMjaVgdmFGTvqfGYUQBRldHFhf9kuXf5LPb+m0BJ/R5AWCyTcX7DHouoGODMfxkCZrimILwYWDkwhYTHr5hEV58nGRQtHOIVB5a4i/y4Z1vvX1MIjA+8OJ3zpaxXKkj+46OtfmjloUPGFSzz/rqq0UbTKmHjy5FmdCfgpiFzNSsJf5IGFKv2BkmMvUOb06IzfVgSs5O3rjqAnLFrUawUMrHcjN8gz144Z18extJ4dO4UlIfqzA2e2bLdJVUKJf+5D18zcIenlJkRmPZX67iDEuZINcnQIDAQABECgoAD4yQf0rTCEOiQq7mkAu+SLVGRwYB6EMPeH2C1tE0V3EfLM5GgugmK9ij3u+U1HweATwLjYbzgXDBhgzA6FNqGRvj8JQ8u0C92DL8Z2XqAFFs2JsXl3uIp761oOR5GTfIi0x7/c928ZEvKSe54PTCyxDMoLSNQSonTDpIb//k/+U4xEOQ1mjlSvlOM5ic7/kdw+G+aP/Hk/T6kg/vIblWQHx8SB3WYpLb/R6oPO+05X+zcQ+vVX1TrQ/amDp6/PouWjTF5hf48JEBdM8+xJzUwnalrG9U7pChfyGAOXQT1fbDdywBJXt6pZsT/mz1RkUC5Uto5/aVQGIDD+IPm/ZDbQgoAGDEwF09sjUb5hHEdmG28RmMf4E0JCOEzCvxiUpovobymqapLM5bf2oLNXqGenEAMbfFQatJFVKx6YBZwFIj/xzQJt8fL/jRzlbLijaANP+1JacvTsfXKBXS888FN3rkKisTlhmYXI+4EwA1wbcRkLDH3vezdVCi9cszQ9HvwkVfOwgoAD7QvzD3pirXIJ64JizWTS4MJMko3CWepsq9UZ5uyoHWh7tSz86H/2y0FK10YpJEJeGtyPXlnU+uQwjYMJRPLlNv8180pjCJX2ZTW2drB2vOJvormhMhDIYAZtPAHu2dajzdy4VRuvFTtH4FpW/KjAJrTLK3ze3K95ACYVBJ8EmBwgoADQK8DiNN724hmLjvqTMjiLpJ19U/lE5+jqbM3qmtTDWl0ddr9BdzH9/E2kKZefLbv8VJH2TQjO07hdRhk599/jZ5BGseSQvOyysaEMgj6ZjunwHOwSNjDspdiOk/uTzPIyVmY2eDDD1zRAiWi2jmBTI2vOIm3CSa75TgofLu4XFAoABJrFM4+vYNlFXbY0/LqU+21ttmV+K471rPj0Jto7GPM4Zs6CaEr0g8COpDQNA6JoDv5Td0eIDWZ6c+ii5G9H+VjUCc6WprQIhepVkGzsJUjWlOrp66MeVwEElFdAk/PbXBvEUOWYTwi1uY6Y0trzMK31OvFOODKjWf6WHrf4tfgnAoABOri6bX2D/zqpJT3mJ5MIVJJbn4D4Idx+TCUaVRSY1rBp+Y2ofW1W8ktu7xPO9/LwVQR7kJeosEBAFGTmGqll033ywu5+8X8J1bw6HCghkI0yHW752sOdfl30kXi3Ds8tQsvSEHRfnPb8yvWve2srZb9ubwOvpI0PtOIujZP4fYI="
+
+  content, err := utils.DecryptCallback(platformPubKey, isvPriKey, callback)
+  if nil != err {
+	  //"decrypt failed"
+  }
+```
+
+----------------------------------------
+
+TITLE: Decrypt Callback Content in Go
+DESCRIPTION: Shows how to decrypt callback content using `utils.DecryptCallback`. This function requires the platform public key, the ISV private key, and the encrypted callback string. It returns the decrypted content or an error.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_9
+
+LANGUAGE: go
+CODE:
+```
+//utils.DecryptCallback
+
+var callback = "Ars6jASSiylO70_VJDQ5SFU1zQwaI36kG5WhlSKHjkGdU3fEVEkkbhvAxKjOTUiw9vF7RMnmGKQQWAuV8jCKaOpMNjIEMHehBaPASwTiEE946CcbOeoNILGHf0o20xj2gqqvkQToFXEMNiic7bcYbfi0PxIrR6loBZnW-m5bqzB5RXLibiSjGlmr5CDnxV4tZXmYlkkeN2BcT4msWjfCtuaTMK_fN77WJcCMlW7ffqiN5yIOeqB4QBb5lOnClTRW4DThKPOMkXupAM2AnPxTkDp4n9lh-SK56zLuafk1bQhWUNcS9L4YEKZGJIjP7DY20TAWEr3yXo8w0w0VtB13Ig$Xf6fETKWcLTudBh2HluGSQTqhBRJa6EXHhXlMryWW8Y384RjVwIfpQm19RmTgkoqRc2tNcTWxRIW6itIS62DrzixlqRa099jx21uGqt8FCpvdWwnwlC16SgkeU_5NnrpjA_WQ0XW9RhNxzuQmwfxHGbtnth4vNXWswcSm23j3KQaXFjVP5Ws1uYVCxYSLMxqJE7a56DNWONGcGJJsc0KTCc7cdfr8n24emAaPCNteIG2RM8B17pRxY5yVnguTSZPXmhBlyI25xS7rciWzKZLp2Kfh_JCivABbA-_5V3VWPmjITs-TR5HlGVFbnT0eOUMUepXUemjjP8R0f8cBeH2NKej6QjQL99tvlrrxg_QfmezE0WTCITCNDBhpbHiq90lFyLjwlWNDTRo8rhjouSlMA9Ae_b-B4eZorDRVxw3BWywdyo2FzNk-dUDeBVaIth9YsaMGsq9XivGjlnnx3YEVfEtuVSvEm1xBdYsTHcM02nMwZb8Ze2WL1kIFo8IFM0$AES$SHA256"
+// This is test data, please use the real platform public key for production
+var platformPubKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7LqdMV7ZeOWUwVp0duSucTr4VwUNHtYLlWEUWlBtDQDEPhx0WZZdwzDxEbQqMQM5BjXZACYlhEdPt0HicDthOIUeUt8JNcvgq06vIE958RzgVBa5z3zvMLYWJIZaUyxsxC7Us06eNiB+du0rEBxUckru41ZSu/DX9jssFC+l5459b3WWELNf2fXqJyfb4f8GuGk8enXgJdxBUcmwgaEQxJjWkPqhzSiRy9GKjcXBdCkzCYR4xmLkHe6K0YFiBxax7lOni3zVOsvHC9XdhbepwB9fMkHbZXS/LJf5aS5ltendObpVrAD9kck7bIQzsrM49/SG/dYmbtm139I6ygsCzQIDAQAB"
+var isvPriKey = "<Private Key Text>"
+
+content, err := utils.DecryptCallback(platformPubKey, isvPriKey, callback)
+if nil != err {
+    //"decrypt failed"
+}
+```
+
+----------------------------------------
+
+TITLE: Verify YOP Platform Signature in Go
+DESCRIPTION: This Go code snippet demonstrates how to verify a digital signature using the `utils.VerifySign` function. It takes the original data, the signature string, the public key, and the hashing algorithm (SHA256) as inputs to check the integrity and authenticity of the data. The example includes sample public key, signature, and data.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/llms.txt#_snippet_4
+
+LANGUAGE: Go
+CODE:
+```
+var pubKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwRwXR20F7D0/hKQISwPZNkOTvBiwgFBS1mAee1IXOGTWtmFIY60xbxWTBULjI2lYHZhRk76nxmFEAUZXRxYX/ZLl3+Sz2/ptASf0eQFgsk3F+wx6LqBjgzH8ZAma4piC8GFw5MIWEx6+YRFefJxkULRziFQeWuIv8uGdb719TCIwPvDid86WsVypI/uOjrX5o5aFDxhUs8/q6q0UbTKmHjy5FmdCfgpiFzNSsJf5IGFKv2BkmMvUOb06IzfVgSs5O3rjqAnLFrUawUMrHcjN8gz144Z18extJ4dO4UlIfqzA2e2bLdJVUKJf+5D18zcIenlJkRmPZX67iDEuZINcnQIDAQAB"
 var signature = "glTZg6lLl6oV4Ho15fAUegcVILlTwYJkbZO_Iz8AYUKTZ_1JP4AqAqSdm3GqjaukoNrDkxPGv2WW8plxYxtzsXjkzWiCMth5aShHgA7a9SXW0jfo365KPyVj0zFO2QIV9odHEnY1apwcAxvr54j4d5SHoC3vKUczZ20txTsNjcG9ifi1AoJhblILxKL2NO0tdIzTMQCRaBdOXUOdnL7RgP1qPew5yJT4e1QdtTjkirCKJurm4SumOA3Uroz-G-9MUZgiTkU4RXrEvu-rJPlqfJPsITYoWLsuPy1Gfne_5j-IgChXpoHacI0s-NlzKmyjsFt3-5aUYDd0cFw58ErUXw"
 var data = "{\"result\":{\"requestId\":\"requestId\",\"errorMsg\":\"exception.record.not.found.transferDomesticOrder|merchantId:[null],requestId:[requestId]\",\"status\":\"FAILED\"}}"
 if !utils.VerifySign(data, signature, pubKey, crypto.SHA256) {
@@ -86,22 +729,152 @@ if !utils.VerifySign(data, signature, pubKey, crypto.SHA256) {
 
 ----------------------------------------
 
-TITLE: Decrypting YOP Callback Content Go
-DESCRIPTION: This code demonstrates how to decrypt content received in a callback from the Yeepay platform using the utils.DecryptCallback function. It requires the platform's public key, the ISV's private key, and the encrypted callback string as inputs.
-SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_6
+TITLE: Verifying Signature with YOP SDK Go
+DESCRIPTION: This snippet shows how to verify a signature against a piece of data using the utils.VerifySign function. It requires the data, the signature string, the platform's public key, and the signing algorithm (crypto.SHA256) to check if the signature is valid.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/llms.txt#_snippet_3
 
 LANGUAGE: Go
 CODE:
 ```
-  //utils.DecryptCallback
+//utils.VerifySign
 
-  var callback = "Ars6jASSiylO70_VJDQ5SFU1zQwaI36kG5WhlSKHjkGdU3fEVEkkbhvAxKjOTUiw9vF7RMnmGKQQWAuV8jCKaOpMNjIEMHehBaPASwTiEE946CcbOeoNILGHf0o20xj2gqqvkQToFXEMNiic7bcYbfi0PxIrR6loBZnW-m5bqzB5RXLibiSjGlmr5CDnxV4tZXmYlkkeN2BcT4msWjfCtuaTMK_fN77WJcCMlW7ffqiN5yIOeqB4QBb5lOnClTRW4DThKPOMkXupAM2AnPxTkDp4n9lh-SK56zLuafk1bQhWUNcS9L4YEKZGJIjP7DY20TAWEr3yXo8w0w0VtB13Ig$Xf6fETKWcLTudBh2HluGSQTqhBRJa6EXHhXlMryWW8Y384RjVwIfpQm19RmTgkoqRc2tNcTWxRIW6itIS62DrzixlqRa099jx21uGqt8FCpvdWwnwlC16SgkeU_5NnrpjA_WQ0XW9RhNxzuQmwfxHGbtnth4vNXWswcSm23j3KQaXFjVP5Ws1uYVCxYSLMxqJE7a56DNWONGcGJJsc0KTCc7cdfr8n24emAaPCNteIG2RM8F17pRxY5yVnguTSZPXmhBlyI25xS7rciWzKZLp2Kfh_JCivABbA-_5Vf3VWPmjITs-TR5HlGVFbnT0eOUMUepXUemjjP8R0f8cBeH2NKej6QjQL99tvrrxg_QfmezE0WTCITCNDBhpbHiq90lFyLjwlWNDTRo8rhjouSlMA9Ae_b-B4eZorDRVxw3BWywdyo2FzNk-dUDeBVaIth9YsaMGsqvXivGjlnnx3YEVfEtuVSvEm1xBdYsTHcM02nMwZb8Ze2WL1kIFo8IFM0$AES$SHA256"
-  // 此处为测试数据，正式使用是请使用真实的平台公钥
-  var platformPubKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7LqdMV7ZeOWUwVp0duSucTr4VwUNHtYLlWEUWlBtDQDEPhx0WZZdw2DxEbQqMQM5BjXZACYlhEdPt0HicDthOIUeUt8JNcvgq06vIE958RzgVBa5z3zvMLYWJIZaUyxsxC7Us06eNiB+du0rEBxUckru41ZSu/DX9jssFC+l5459b3WWELNf2fXqJyfb4f8GuGk8enXgJdxBUcmwgaEQxJjWkPqhzSiRy9GKjcXBdCkzCYR4xmLkHe6K0YFiBxax7lOni3zVOsvHC9XdhbepwB9fMkHbZXS/LJf5aS5ltendObpVrAD9kck7bIQzsrM49/SG/dYmbtm139I6ygsCzQIDAQAB"
-  var isvPriKey = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDBHBdHbQXsPT+EpAhLA9k2Q5O8GLCAUFLWYB57Uhc4ZNa2YUhjrTFvFZMFQuMjaVgdmFGTvqfGYUQBRldHFhf9kuXf5LPb+m0BJ/R5AWCyTcX7DHouoGODMfxkCZrimILwYWDkwhYTHr5hEV58nGRQtHOIVB5a4i/y4Z1vvX1MIjA+8OJ3zpaxXKkj+46OtfmjloUPGFSzz+rqq0UbTKmHjy5FmdCfgpiFzNSsJf5IGFKv2BkmMvUOb06IzfVgSs5O3rjqAnLFrUawUMrHcjN8gz144Z18extJ4dO4UlIfqzA2e2bLdJVUKJf+5D18zcIenlJkRmPZX67iDEuZINcnQIDAQABECgoAD4yQf0rTCEOiQq7mkAu+SLVGRwYB6EMPeH2C1tE0V3EfLM5GgugmK9ij3u+U1HweATwLjYbzgXDBhgzA6FNqGRvj8JQ8u0C92DL8Z2XqAFFs2JsXl3uIp761oOR5GTfIi0x7/c928ZEvKSe54PTCyxDMoLSNQSonTDpIb//k/+U4xEOQ1mjlSvlOM5ic7/kdw+G+aP/Hk/T6kg/vIblWQHx8SB3WYpLb/R6oPO+05X+zcQ+vVX1TrQ/amDp6/PouWjTF5hf48JEBdM8+xJzUwnalrG9U7pChfyGAOXQT1fbDdywBJXt6pZsT/mz1RkUC5Uto5/aVQGIDD+IPm/ZDbQgoAGDEwF09sjUb5hHEdmG28RmMf4E0JCOEzCvxiUpovobymqapLM5bf2oLNXqGenEAMbfFQatJFVKx6YBZwFIj/xzQJt8fL/jRzlbLijaANP+1JacvTsfXKBXS888FN3rkKisTlhmYXI+4EwA1wbcRkLDH3vezdVCi9cszQ9HvwkVfOwgoAD7QvzD3pirXIJ64JizWTS4MJMko3CWepsq9UZ5uyoHWh7tSz86H/2y0FK10YpJEJeGtyPXlnU+uQwjYMJRPLlNv8180pjCJX2ZTW2drB2vOJvormhMhDIYAZtPAHu2dajzdy4VRuvFTtH4FpW/KjAJrTLK3ze3K95ACYVBJ8EmBwgoADQK8DiNN724hmLjvqTMjiLpJ19U/lE5+jqbM3qmtTDWl0ddr9BdzH9/E2kKZefLbv8VJH2TQjO07hdRhk599/jZ5BGseSQvOyysaEMgj6ZjunwHOwSNjDspdiOk/uTzPIyVmY2eDDD1zRAiWi2jmBTI2vOIm7CSa75TgofLu4XFAoABJrFM4+vYNlFXbY0/LqU+21ttmV+K471rPj0Jto7GPM4Zs6CaEr0g8COpDQNA6JoDv5Td0eIDWZ6c+ii5G9H+VjUCc6WprQIhepVkGzsJUjWlOrp66MeVwEElFdAk/PbXBvEUOWYTwi1uY6Y0trzMK31OvFOODKjWf6WHrf4tfgnAoABOri6bX2D/zqpJT3mJ5MIVJJbn4D4Idx+TCUaVRSY1rBp+Y2ofW1W8ktu7xPO9/LwVQR7kJeosEBAFGTmGqll033ywu5+8X8J1bw6HCghkI0yHW752sOdfl30kXi3Ds8tQsvSEHRfnPb8yvWve2srZb9ubwOvpI0PtOIujZP4fYI="
+// 此处为测试数据
+```
 
-  content, err := utils.DecryptCallback(platformPubKey, isvPriKey, callback)
-  if nil != err {
-	  //"decrypt failed"
-  }
+----------------------------------------
+
+TITLE: Verify RSA Signature in Go
+DESCRIPTION: Demonstrates how to verify an RSA signature using `utils.VerifySign`. This function checks the authenticity of data against a provided signature, public key, and hashing algorithm. It returns a boolean indicating verification success or failure.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_11
+
+LANGUAGE: go
+CODE:
+```
+//utils.VerifySign
+
+// This is test data
+var pubKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwRwXR20F7D0/hKQISwPZNkOTvBiwgFBS1mAee1IXOGTWtmFIY60xbxWTBULjI2lYHZhRk76nxmFEAUZXRxYX/ZLl3+Sz2/ptASf0eQFgsk3F+wx6LqBjgzH8ZAma4piC8GFg5MIWEx6+YRFefJxkULRziFQeWuIv8uGdb719TCIwPvDid86WsVypI/uOjrX5o5aFDxhUs8/q6q0UbTKmHjy5FmdCfgpiFzNSsJf5IGFKv2BkmMvUOb06IzfVgSs5O3rjqAnLFrUawUMrHcjN8gz144Z18extJ4dO4UlIfqzA2e2bLdJVUKJf+5D18zcIenlJkRmPZX67iDEuZINcnQIDAQAB"
+var signature = "glTZg6lLl6oV4Ho15fAUegcVILlTwYJkbZO_Iz8AYUKTZ_1JP4AqAqSdm3GqjaukoNrDkxPGv2WW8plxYxtzsXjkzWiCMth5aShHgA7a9SXW0jfo365KPyVj0zFO2QIV9odHEnY1apwcAxvr54j4d5SHoC3vKUczZ20txTsNjcG9ifi1AoJhblILxKL2NO0tdIzTMQCRaBdOXUOdnL7RgP1qPew5yJT4e1QdtTjkirCKJurm4SumOA3Uroz-G-9MUZgiTkU4RXrEvu-rJPlqfJPsITYoWLsuPy1Gfne_5j-IgChXpoHacI0s-NlzKmyjsFt3-5aUYDd0cFw58ErUXr"
+var data = "{\"result\":{\"requestId\":\"requestId\",\"errorMsg\":\"exception.record.not.found.transferDomesticOrder|merchantId:[null],requestId:[requestId]\",\"status\":\"FAILED\"}}"
+if !utils.VerifySign(data, signature, pubKey, crypto.SHA256) {
+     //verify failed
+}
+```
+
+----------------------------------------
+
+TITLE: Process Batch YOP SDK Requests Concurrently
+DESCRIPTION: Illustrates a Go function for processing multiple YOP SDK requests concurrently using a semaphore to limit the maximum number of parallel goroutines, ensuring efficient resource utilization.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_22
+
+LANGUAGE: go
+CODE:
+```
+func processBatchRequests(requests []*request.YopRequest) {
+    const maxConcurrency = 10
+    semaphore := make(chan struct{}, maxConcurrency)
+    var wg sync.WaitGroup
+
+    for _, req := range requests {
+        wg.Add(1)
+        go func(r *request.YopRequest) {
+            defer wg.Done()
+            semaphore <- struct{}{} // Acquire semaphore
+            defer func() { <-semaphore }() // Release semaphore
+
+            resp, err := client.DefaultClient.Request(r)
+            if err != nil {
+                log.Printf("Request failed: %v", err)
+                return
+            }
+            // Process response...
+        }(req)
+    }
+
+    wg.Wait()
+}
+```
+
+----------------------------------------
+
+TITLE: Mock YOP Go SDK Client for Testing
+DESCRIPTION: Illustrates how to create a mock client for the YOP Go SDK to facilitate testing without making actual API calls.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/examples/README.md#_snippet_6
+
+LANGUAGE: Go
+CODE:
+```
+// Create a mock client for testing
+mockClient := &MockYopClient{}
+yopResp, err := mockClient.Request(yopRequest)
+```
+
+----------------------------------------
+
+TITLE: Add Custom Headers to YOP Go SDK Request
+DESCRIPTION: Shows how to include custom HTTP headers in a YOP Go SDK request by modifying the Headers map.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/examples/README.md#_snippet_4
+
+LANGUAGE: Go
+CODE:
+```
+yopRequest.Headers["Custom-Header"] = "custom-value"
+```
+
+----------------------------------------
+
+TITLE: Set Custom Timeout for YOP Go SDK Request
+DESCRIPTION: Demonstrates how to configure a custom timeout duration for a YOP Go SDK request using the Timeout property.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/examples/README.md#_snippet_3
+
+LANGUAGE: Go
+CODE:
+```
+yopRequest := request.NewYopRequest(constants.GET_HTTP_METHOD, "/api/path")
+yopRequest.Timeout = 30 * time.Second // Custom timeout
+```
+
+----------------------------------------
+
+TITLE: Configure Logging for YOP Go SDK
+DESCRIPTION: Shows how to customize the logging behavior of the YOP Go SDK, including setting a custom log output destination and disabling log output entirely using `io.Discard`.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_18
+
+LANGUAGE: go
+CODE:
+```
+import (
+    "log"
+    "os"
+    "github.com/yop-platform/yop-go-sdk/yop/utils"
+)
+
+// Custom log output
+utils.Logger = log.New(os.Stdout, "YOP-SDK: ", log.LstdFlags)
+
+// Disable log output
+utils.Logger = log.New(io.Discard, "", 0)
+```
+
+----------------------------------------
+
+TITLE: Optimize HTTP Connection Pool for YOP SDK
+DESCRIPTION: Shows how to configure the `http.Transport` to optimize connection pooling parameters like `MaxIdleConns`, `MaxIdleConnsPerHost`, and `IdleConnTimeout` for improved performance of HTTP requests.
+SOURCE: https://github.com/yop-platform/yop-go-sdk/blob/main/README.md#_snippet_21
+
+LANGUAGE: go
+CODE:
+```
+// Optimize HTTP transport configuration
+transport := &http.Transport{
+    MaxIdleConns:        100,
+    MaxIdleConnsPerHost: 10,
+    IdleConnTimeout:     90 * time.Second,
+    TLSHandshakeTimeout: 10 * time.Second,
+}
+
+customClient := &http.Client{
+    Transport: transport,
+    Timeout:   30 * time.Second,
+}
 ```
