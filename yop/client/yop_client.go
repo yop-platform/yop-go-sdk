@@ -92,7 +92,7 @@ func buildUserAgent() string {
 
 func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 	if yopRequest.Timeout == 0 {
-		yopRequest.Timeout = 60 * time.Second
+		yopRequest.Timeout = 10 * time.Second
 	}
 	ctx, _ := context.WithTimeout(context.Background(), yopRequest.Timeout)
 	//defer cancel()

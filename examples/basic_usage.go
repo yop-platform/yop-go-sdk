@@ -32,7 +32,7 @@ func main() {
 
 func getExample(appId, privateKey string) {
 	// Create private key object
-	priKey := &request.IsvPriKey{
+	priKey := request.IsvPriKey{
 		Value:    privateKey,
 		CertType: request.RSA2048,
 	}
@@ -40,7 +40,7 @@ func getExample(appId, privateKey string) {
 	// Create GET request
 	yopRequest := request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/query")
 	yopRequest.AppId = appId
-	yopRequest.IsvPriKey = *priKey
+	yopRequest.IsvPriKey = priKey
 
 	// Add query parameters
 	yopRequest.AddParam("merchantId", "123456789")
@@ -58,7 +58,7 @@ func getExample(appId, privateKey string) {
 
 func postJsonExample(appId, privateKey string) {
 	// Create private key object
-	priKey := &request.IsvPriKey{
+	priKey := request.IsvPriKey{
 		Value:    privateKey,
 		CertType: request.RSA2048,
 	}
@@ -66,7 +66,7 @@ func postJsonExample(appId, privateKey string) {
 	// Create POST request
 	yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/create")
 	yopRequest.AppId = appId
-	yopRequest.IsvPriKey = *priKey
+	yopRequest.IsvPriKey = priKey
 
 	// Set JSON content
 	jsonContent := `{
@@ -89,7 +89,7 @@ func postJsonExample(appId, privateKey string) {
 
 func postFormExample(appId, privateKey string) {
 	// Create private key object
-	priKey := &request.IsvPriKey{
+	priKey := request.IsvPriKey{
 		Value:    privateKey,
 		CertType: request.RSA2048,
 	}
@@ -97,7 +97,7 @@ func postFormExample(appId, privateKey string) {
 	// Create POST request
 	yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/form")
 	yopRequest.AppId = appId
-	yopRequest.IsvPriKey = *priKey
+	yopRequest.IsvPriKey = priKey
 
 	// Add form parameters
 	yopRequest.AddParam("merchantId", "123456789")

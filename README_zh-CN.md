@@ -65,11 +65,11 @@ const (
 ### 配置示例
 
 ```go
-var priKey = &request.IsvPriKey{Value: "您的私钥内容", CertType: request.RSA2048}
+var priKey = request.IsvPriKey{Value: "您的私钥内容", CertType: request.RSA2048}
 var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/api/path")
 yopRequest.AppId = "您的AppId"
 yopRequest.IsvPriKey = priKey
-yopRequest.Timeout = 15 // 设置超时时间为 15 秒（可选）
+yopRequest.Timeout = 15 * time.Second // 设置超时时间为 15 秒（可选）
 ```
 
 ## 🚀 用法 / 快速开始
@@ -88,7 +88,7 @@ import (
 ### GET 请求示例
 
 ```go
-var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
 var yopRequest = request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
@@ -126,7 +126,7 @@ yopRequest.IsvPriKey = priKey
 var params = map[string]any{}
 params["merchantId"] = "1595815987915711"
 params["requestId"] = "requestId"
-result.Content = utils.ParseToJsonStr(params)
+yopRequest.Content = utils.ParseToJsonStr(params)
 
 yopResp, err := client.DefaultClient.Request(yopRequest)
 if nil != err{ 
@@ -142,7 +142,7 @@ var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
 var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
-result.AddFile("file", f)
+yopRequest.AddFile("file", f)
 yopResp, err := client.DefaultClient.Request(yopRequest)
 if nil != err{ 
     // request failed
