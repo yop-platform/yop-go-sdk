@@ -46,10 +46,7 @@ func VerifySign(content string, signature string, pubKey string, hash crypto.Has
 func Verify(content []byte, signature []byte, pub *rsa.PublicKey, hash crypto.Hash) bool {
 	hashed := sha256.Sum256(content)
 	err := rsa.VerifyPKCS1v15(pub, hash, hashed[:], signature)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 // Sign rsa签名
