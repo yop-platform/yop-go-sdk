@@ -9,7 +9,7 @@ func TestNewYopRequestTimeout(t *testing.T) {
 	// 测试NewYopRequest的默认超时时间
 	req := NewYopRequest("GET", "/test")
 
-	expectedTimeout := 60 * time.Second
+	expectedTimeout := 10 * time.Second
 	if req.Timeout != expectedTimeout {
 		t.Errorf("Expected timeout %v, got %v", expectedTimeout, req.Timeout)
 	}
@@ -21,7 +21,7 @@ func TestBuildYopRequestTimeout(t *testing.T) {
 	// 测试BuildYopRequest的默认超时时间
 	req := BuildYopRequest()
 
-	expectedTimeout := 60 * time.Second
+	expectedTimeout := 10 * time.Second
 	if req.Timeout != expectedTimeout {
 		t.Errorf("Expected timeout %v, got %v", expectedTimeout, req.Timeout)
 	}

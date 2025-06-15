@@ -94,7 +94,7 @@ func buildGetYopRequest() *request.YopRequest {
 	yopRequest.IsvPriKey = priKey
 	yopRequest.AddParam("string0", "le1%3D%3D")
 	yopRequest.AddParam("p4", "中文%%")
-	// 使用默认超时时间（60秒）
+	// 使用默认超时时间（10秒）
 	return yopRequest
 }
 

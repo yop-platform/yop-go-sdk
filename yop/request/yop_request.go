@@ -50,7 +50,7 @@ type YopRequest struct {
 
 // NewYopRequest 创建请求
 func NewYopRequest(httpMethod string, apiUri string) *YopRequest {
-	return &YopRequest{HttpMethod: httpMethod, ApiUri: apiUri, Timeout: 60 * time.Second}
+	return &YopRequest{HttpMethod: httpMethod, ApiUri: apiUri, Timeout: 10 * time.Second}
 }
 
 func (request *YopRequest) AddParam(name string, value any) {
@@ -88,7 +88,7 @@ func BuildYopRequest() *YopRequest {
 	var platformCert = PlatformPubKey{Value: YOP_PLATFORM_PUBLIC_KEY, CertType: RSA2048}
 	var requestId = utils.GenerateRequestID()
 
-	return &YopRequest{RequestId: requestId, IsvPriKey: isvPriKey, PlatformPubKey: platformCert, Params: map[string][]string{}, Headers: map[string]string{}, Files: map[string]*os.File{}, Timeout: 60 * time.Second}
+	return &YopRequest{RequestId: requestId, IsvPriKey: isvPriKey, PlatformPubKey: platformCert, Params: map[string][]string{}, Headers: map[string]string{}, Files: map[string]*os.File{}, Timeout: 10 * time.Second}
 }
 
 func (request *YopRequest) HandleServerRoot() {

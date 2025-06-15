@@ -54,14 +54,14 @@ func customClientExample() {
 	yopClient := client.YopClient{Client: customClient}
 
 	// Create request
-	priKey := &request.IsvPriKey{
+	priKey := request.IsvPriKey{
 		Value:    "your-private-key",
 		CertType: request.RSA2048,
 	}
 
 	yopRequest := request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/query")
 	yopRequest.AppId = "your-app-id"
-	yopRequest.IsvPriKey = *priKey
+	yopRequest.IsvPriKey = priKey
 	yopRequest.Timeout = 15 * time.Second // Custom timeout for this request
 
 	// Send request with custom client
@@ -84,14 +84,14 @@ func fileUploadExample() {
 	defer file.Close()
 
 	// Create request
-	priKey := &request.IsvPriKey{
+	priKey := request.IsvPriKey{
 		Value:    "your-private-key",
 		CertType: request.RSA2048,
 	}
 
 	yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/file/upload")
 	yopRequest.AppId = "your-app-id"
-	yopRequest.IsvPriKey = *priKey
+	yopRequest.IsvPriKey = priKey
 
 	// Add file
 	yopRequest.AddFile("file", file)
@@ -151,14 +151,14 @@ func signatureExample() {
 
 func errorHandlingExample() {
 	// Create request with invalid configuration to demonstrate error handling
-	priKey := &request.IsvPriKey{
+	priKey := request.IsvPriKey{
 		Value:    "invalid-private-key",
 		CertType: request.RSA2048,
 	}
 
 	yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/error")
 	yopRequest.AppId = "invalid-app-id"
-	yopRequest.IsvPriKey = *priKey
+	yopRequest.IsvPriKey = priKey
 
 	// Send request
 	yopResp, err := client.DefaultClient.Request(yopRequest)
