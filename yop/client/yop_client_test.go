@@ -6,6 +6,8 @@
 package client
 
 import (
+	"encoding/json"
+	"errors"
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
 	"github.com/yop-platform/yop-go-sdk/yop/response"
