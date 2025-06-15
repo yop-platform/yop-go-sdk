@@ -38,7 +38,11 @@ This SDK provides a convenient way to integrate YeePay payment and other service
 Install this package using Go modules:
 
 ```bash
+# Install latest version
 go get github.com/yop-platform/yop-go-sdk
+
+# Install specific version
+go get github.com/yop-platform/yop-go-sdk@v1.4.40
 ```
 
 ## ⚙️ Configuration

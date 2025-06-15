@@ -38,7 +38,11 @@
 使用 Go 模块安装此包：
 
 ```bash
+# 安装最新版本
 go get github.com/yop-platform/yop-go-sdk
+
+# 安装指定版本
+go get github.com/yop-platform/yop-go-sdk@v1.4.40
 ```
 
 ## ⚙️ 配置
