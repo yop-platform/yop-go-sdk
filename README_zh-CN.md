@@ -1,8 +1,19 @@
 # YOP Go SDK
 
+<div align="center">
+
 [![Go Reference](https://pkg.go.dev/badge/github.com/yop-platform/yop-go-sdk.svg)](https://pkg.go.dev/github.com/yop-platform/yop-go-sdk)
+[![CI/CD](https://github.com/yop-platform/yop-go-sdk/workflows/CI%2FCD/badge.svg)](https://github.com/yop-platform/yop-go-sdk/actions)
+[![Go Report Card](https://goreportcard.com/badge/github.com/yop-platform/yop-go-sdk)](https://goreportcard.com/report/github.com/yop-platform/yop-go-sdk)
+[![codecov](https://codecov.io/gh/yop-platform/yop-go-sdk/branch/main/graph/badge.svg)](https://codecov.io/gh/yop-platform/yop-go-sdk)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![GitHub release](https://img.shields.io/github/release/yop-platform/yop-go-sdk.svg)](https://github.com/yop-platform/yop-go-sdk/releases)
+[![Go version](https://img.shields.io/github/go-mod/go-version/yop-platform/yop-go-sdk)](https://github.com/yop-platform/yop-go-sdk)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/yop-platform/yop-typescript-sdk)
+
+[English](README.md) | 中文
+
+</div>
 
 一个专为与 YOP（易宝开放平台）API 进行无缝交互而设计的 Go SDK。
 
@@ -239,9 +250,221 @@ if !utils.VerifySign(data, signature, pubKey, crypto.SHA256) {
 - `utils.RsaSignBase64(content, priKey string, hash crypto.Hash) (string, error)`: 生成签名
 - `utils.VerifySign(data, signature, pubKey string, hash crypto.Hash) bool`: 验证签名
 
-## 🤝 贡献
+## 🔧 高级配置
 
-欢迎贡献！如果您发现任何问题或有改进建议，请提交 issue 或 pull request。
+### 环境配置
+
+SDK 支持多种环境配置：
+
+```go
+// 生产环境（默认）
+yopRequest.ServerRoot = "https://openapi.yeepay.com/yop-center"
+
+// 测试环境
+yopRequest.ServerRoot = "https://ycetest.yeepay.com:30228/yop-center"
+
+// YOS 文件服务
+yopRequest.ServerRoot = "https://yos.yeepay.com/yop-center"
+```
+
+### 自定义HTTP客户端
+
+```go
+import (
+    "net/http"
+    "time"
+)
+
+// 创建自定义HTTP客户端
+customClient := &http.Client{
+    Timeout: 30 * time.Second,
+    Transport: &http.Transport{
+        MaxIdleConns:        100,
+        MaxIdleConnsPerHost: 10,
+        IdleConnTimeout:     90 * time.Second,
+    },
+}
+
+// 使用自定义客户端
+yopClient := client.YopClient{Client: customClient}
+yopResp, err := yopClient.Request(yopRequest)
+```
+
+### 日志配置
+
+```go
+import (
+    "log"
+    "os"
+    "github.com/yop-platform/yop-go-sdk/yop/utils"
+)
+
+// 自定义日志输出
+utils.Logger = log.New(os.Stdout, "YOP-SDK: ", log.LstdFlags)
+
+// 禁用日志输出
+utils.Logger = log.New(io.Discard, "", 0)
+```
+
+## 🚨 错误处理
+
+### 常见错误类型
+
+```go
+yopResp, err := client.DefaultClient.Request(yopRequest)
+if err != nil {
+    // 网络错误或请求构建错误
+    log.Printf("请求失败: %v", err)
+    return
+}
+
+// 检查业务错误
+if yopResp.Result != nil {
+    result := yopResp.Result.(map[string]interface{})
+    if status, ok := result["status"]; ok && status != "SUCCESS" {
+        log.Printf("业务错误: %v", result["errorMsg"])
+        return
+    }
+}
+```
+
+### 重试机制
+
+```go
+func requestWithRetry(yopRequest *request.YopRequest, maxRetries int) (*response.YopResponse, error) {
+    var lastErr error
+
+    for i := 0; i <= maxRetries; i++ {
+        yopResp, err := client.DefaultClient.Request(yopRequest)
+        if err == nil {
+            return yopResp, nil
+        }
+
+        lastErr = err
+        if i < maxRetries {
+            time.Sleep(time.Duration(i+1) * time.Second) // 指数退避
+        }
+    }
+
+    return nil, fmt.Errorf("请求失败，已重试 %d 次: %v", maxRetries, lastErr)
+}
+```
+
+## 📊 性能优化
+
+### 连接池配置
+
+```go
+// 优化HTTP传输配置
+transport := &http.Transport{
+    MaxIdleConns:        100,
+    MaxIdleConnsPerHost: 10,
+    IdleConnTimeout:     90 * time.Second,
+    TLSHandshakeTimeout: 10 * time.Second,
+}
+
+customClient := &http.Client{
+    Transport: transport,
+    Timeout:   30 * time.Second,
+}
+```
+
+### 批量请求处理
+
+```go
+func processBatchRequests(requests []*request.YopRequest) {
+    const maxConcurrency = 10
+    semaphore := make(chan struct{}, maxConcurrency)
+    var wg sync.WaitGroup
+
+    for _, req := range requests {
+        wg.Add(1)
+        go func(r *request.YopRequest) {
+            defer wg.Done()
+            semaphore <- struct{}{} // 获取信号量
+            defer func() { <-semaphore }() // 释放信号量
+
+            resp, err := client.DefaultClient.Request(r)
+            if err != nil {
+                log.Printf("请求失败: %v", err)
+                return
+            }
+            // 处理响应...
+        }(req)
+    }
+
+    wg.Wait()
+}
+```
+
+## 🧪 测试
+
+### 单元测试
+
+```bash
+# 运行所有测试
+go test ./...
+
+# 运行测试并显示覆盖率
+go test -cover ./...
+
+# 生成覆盖率报告
+go test -coverprofile=coverage.out ./...
+go tool cover -html=coverage.out -o coverage.html
+```
+
+### 基准测试
+
+```bash
+# 运行基准测试
+go test -bench=. ./...
+
+# 运行基准测试并显示内存分配
+go test -bench=. -benchmem ./...
+```
+
+## 🤝 贡献指南
+
+我们欢迎所有形式的贡献！在贡献之前，请阅读以下指南：
+
+### 开发环境设置
+
+1. **克隆仓库**
+   ```bash
+   git clone https://github.com/yop-platform/yop-go-sdk.git
+   cd yop-go-sdk
+   ```
+
+2. **安装依赖**
+   ```bash
+   go mod download
+   ```
+
+3. **运行测试**
+   ```bash
+   go test ./...
+   ```
+
+4. **代码格式化**
+   ```bash
+   go fmt ./...
+   goimports -w .
+   ```
+
+### 提交规范
+
+- 使用清晰的提交信息
+- 遵循 [Conventional Commits](https://www.conventionalcommits.org/) 规范
+- 确保所有测试通过
+- 添加必要的测试用例
+
+### Pull Request 流程
+
+1. Fork 项目
+2. 创建功能分支 (`git checkout -b feature/amazing-feature`)
+3. 提交更改 (`git commit -m 'Add some amazing feature'`)
+4. 推送到分支 (`git push origin feature/amazing-feature`)
+5. 创建 Pull Request
 
 ---
 
