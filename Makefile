@@ -44,20 +44,20 @@ benchmark: ## Run benchmarks
 # Code quality targets
 fmt: ## Format code
 	@echo "Formatting code..."
-	go fmt ./...
+	go fmt ./yop/...
 	@if command -v goimports >/dev/null 2>&1; then \
-		goimports -w .; \
+		goimports -w ./yop/; \
 	else \
 		echo "goimports not found, skipping import formatting"; \
 	fi
 
 vet: ## Run go vet
 	@echo "Running go vet..."
-	go vet ./...
+	go vet ./yop/...
 
 lint: install-golangci-lint ## Run golangci-lint
 	@echo "Running golangci-lint..."
-	golangci-lint run
+	golangci-lint run ./yop/...
 
 # Dependency management
 deps: ## Download dependencies

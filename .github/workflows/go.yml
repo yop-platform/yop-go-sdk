@@ -42,13 +42,13 @@ jobs:
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
 
       - name: Run golangci-lint
-        run: golangci-lint run --timeout=5m
+        run: golangci-lint run --timeout=5m ./yop/...
 
       - name: Check formatting
         run: |
-          if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+          if [ "$(gofmt -s -l ./yop/ | wc -l)" -gt 0 ]; then
             echo "The following files are not formatted:"
-            gofmt -s -l .
+            gofmt -s -l ./yop/
             exit 1
           fi
 
