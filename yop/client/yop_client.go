@@ -10,7 +10,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -49,7 +48,7 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 		return nil, err
 	}
 	defer httpResp.Body.Close()
-	body, err := ioutil.ReadAll(httpResp.Body)
+	body, err := io.ReadAll(httpResp.Body)
 	if nil != err {
 		return nil, err
 	}
