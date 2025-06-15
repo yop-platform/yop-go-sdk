@@ -94,8 +94,8 @@ func buildHttpRequest(yopRequest request.YopRequest) (http.Request, error) {
 	if yopRequest.Timeout == 0 {
 		yopRequest.Timeout = 10 * time.Second
 	}
-	ctx, _ := context.WithTimeout(context.Background(), yopRequest.Timeout)
-	//defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), yopRequest.Timeout)
+	defer cancel()
 
 	var uri = yopRequest.ServerRoot + yopRequest.ApiUri
 	isMultiPart, err := checkForMultiPart(yopRequest)
