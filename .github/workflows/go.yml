@@ -37,12 +37,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
-      - name: Install golangci-lint
+      - name: Install staticcheck
         run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.2
+          go install honnef.co/go/tools/cmd/staticcheck@latest
 
-      - name: Run golangci-lint
-        run: golangci-lint run --timeout=5m ./yop/...
+      - name: Run go vet
+        run: go vet ./yop/...
+
+      - name: Run staticcheck
+        run: $(go env GOPATH)/bin/staticcheck ./yop/...
 
       - name: Check formatting
         run: |

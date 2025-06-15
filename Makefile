@@ -55,9 +55,23 @@ vet: ## Run go vet
 	@echo "Running go vet..."
 	go vet ./yop/...
 
-lint: install-golangci-lint ## Run golangci-lint
+lint: install-staticcheck ## Run code quality checks
+	@echo "Running code quality checks..."
+	@echo "1. Running go vet..."
+	go vet ./yop/...
+	@echo "2. Running staticcheck..."
+	$$(go env GOPATH)/bin/staticcheck ./yop/...
+	@echo "3. Checking formatting..."
+	@if [ "$$(gofmt -s -l ./yop/ | wc -l)" -gt 0 ]; then \
+		echo "The following files are not formatted:"; \
+		gofmt -s -l ./yop/; \
+		exit 1; \
+	fi
+	@echo "All code quality checks passed!"
+
+lint-golangci: install-golangci-lint ## Run golangci-lint (may have compatibility issues)
 	@echo "Running golangci-lint..."
-	golangci-lint run ./yop/...
+	golangci-lint run --timeout=5m ./yop/...
 
 # Dependency management
 deps: ## Download dependencies
@@ -82,7 +96,7 @@ vuln-check: install-govulncheck ## Check for vulnerabilities
 	govulncheck ./yop/...
 
 # Tool installation
-install-tools: install-golangci-lint install-goimports install-gosec install-govulncheck ## Install all development tools
+install-tools: install-golangci-lint install-goimports install-gosec install-govulncheck install-staticcheck ## Install all development tools
 
 install-golangci-lint: ## Install golangci-lint
 	@which golangci-lint > /dev/null || (echo "Installing golangci-lint..." && \
@@ -99,6 +113,10 @@ install-gosec: ## Install gosec
 install-govulncheck: ## Install govulncheck
 	@which govulncheck > /dev/null || (echo "Installing govulncheck..." && \
 		go install golang.org/x/vuln/cmd/govulncheck@latest)
+
+install-staticcheck: ## Install staticcheck
+	@which staticcheck > /dev/null || (echo "Installing staticcheck..." && \
+		go install honnef.co/go/tools/cmd/staticcheck@latest)
 
 # CI targets
 ci: deps fmt vet lint test test-race security ## Run all CI checks

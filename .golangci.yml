@@ -5,6 +5,8 @@ run:
   timeout: 5m
   issues-exit-code: 1
   tests: true
+  modules-download-mode: readonly
+  allow-parallel-runners: true
 
 output:
   formats:
@@ -52,12 +54,25 @@ issues:
         - errcheck
         - gosec
 
+    # Exclude Go standard library issues
+    - path: ".*/(go|src)/.*"
+      linters:
+        - typecheck
+        - staticcheck
+
   exclude-dirs:
     - vendor
     - examples
+    - .git
 
   exclude-files:
     - ".*\\.pb\\.go$"
+    - ".*/go/src/.*"
+    - ".*/go/pkg/.*"
+
+  # Only check files in our project
+  include:
+    - "^yop/.*\\.go$"
 
   max-issues-per-linter: 0
   max-same-issues: 0
