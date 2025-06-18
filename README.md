@@ -296,6 +296,8 @@ yopResp, err := yopClient.Request(yopRequest)
 
 ### Logging Configuration
 
+The SDK provides a unified logging system that can be easily configured:
+
 ```go
 import (
     "os"
@@ -303,20 +305,64 @@ import (
     "github.com/sirupsen/logrus"
 )
 
-// Custom log output with logrus
-logger := logrus.New()
-logger.SetOutput(os.Stdout)
-logger.SetLevel(logrus.DebugLevel)
-utils.SetLogger(logger)
+// Basic logging configuration
+// Set log level (Debug, Info, Warn, Error)
+utils.SetLogLevel(logrus.InfoLevel)
 
-// Set log level
-utils.SetLogLevel(logrus.WarnLevel)
-
-// Disable log output
+// Disable logging completely
 utils.DisableLogging()
 
-// Enable log output
+// Re-enable logging
 utils.EnableLogging()
+
+// Custom logger configuration
+customLogger := logrus.New()
+customLogger.SetOutput(os.Stdout)
+customLogger.SetLevel(logrus.DebugLevel)
+customLogger.SetFormatter(&logrus.JSONFormatter{})
+utils.SetLogger(customLogger)
+
+// Set custom formatter
+utils.SetLogFormatter(&logrus.JSONFormatter{
+    TimestampFormat: "2006-01-02 15:04:05",
+})
+
+// Example: Production logging setup
+func setupProductionLogging() {
+    // Use structured JSON logging for production
+    utils.SetLogFormatter(&logrus.JSONFormatter{
+        TimestampFormat: "2006-01-02T15:04:05.000Z",
+    })
+
+    // Set appropriate log level
+    utils.SetLogLevel(logrus.WarnLevel)
+
+    // Optional: Log to file instead of stdout
+    logFile, err := os.OpenFile("yop-sdk.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+    if err == nil {
+        customLogger := logrus.New()
+        customLogger.SetOutput(logFile)
+        customLogger.SetLevel(logrus.WarnLevel)
+        customLogger.SetFormatter(&logrus.JSONFormatter{})
+        utils.SetLogger(customLogger)
+    }
+}
+```
+
+#### Available Log Levels
+
+- `logrus.DebugLevel`: Detailed debug information
+- `logrus.InfoLevel`: General information (default)
+- `logrus.WarnLevel`: Warning messages
+- `logrus.ErrorLevel`: Error messages only
+
+#### Log Output Examples
+
+```go
+// The SDK will automatically log request information:
+// time="2023-12-01T10:30:45Z" level=info msg="requestId:abc123-def456"
+// time="2023-12-01T10:30:45Z" level=info msg="authString:yop-auth-v3/..."
+// time="2023-12-01T10:30:45Z" level=info msg="statusCode:200"
 ```
 
 ## 🚨 Error Handling

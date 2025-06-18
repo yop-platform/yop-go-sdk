@@ -296,18 +296,73 @@ yopResp, err := yopClient.Request(yopRequest)
 
 ### 日志配置
 
+SDK 提供了统一的日志系统，可以轻松配置：
+
 ```go
 import (
-    "log"
     "os"
     "github.com/yop-platform/yop-go-sdk/yop/utils"
+    "github.com/sirupsen/logrus"
 )
 
-// 自定义日志输出
-utils.Logger = log.New(os.Stdout, "YOP-SDK: ", log.LstdFlags)
+// 基础日志配置
+// 设置日志级别 (Debug, Info, Warn, Error)
+utils.SetLogLevel(logrus.InfoLevel)
 
-// 禁用日志输出
-utils.Logger = log.New(io.Discard, "", 0)
+// 完全禁用日志
+utils.DisableLogging()
+
+// 重新启用日志
+utils.EnableLogging()
+
+// 自定义日志器配置
+customLogger := logrus.New()
+customLogger.SetOutput(os.Stdout)
+customLogger.SetLevel(logrus.DebugLevel)
+customLogger.SetFormatter(&logrus.JSONFormatter{})
+utils.SetLogger(customLogger)
+
+// 设置自定义格式化器
+utils.SetLogFormatter(&logrus.JSONFormatter{
+    TimestampFormat: "2006-01-02 15:04:05",
+})
+
+// 示例：生产环境日志设置
+func setupProductionLogging() {
+    // 生产环境使用结构化JSON日志
+    utils.SetLogFormatter(&logrus.JSONFormatter{
+        TimestampFormat: "2006-01-02T15:04:05.000Z",
+    })
+
+    // 设置合适的日志级别
+    utils.SetLogLevel(logrus.WarnLevel)
+
+    // 可选：日志输出到文件而不是标准输出
+    logFile, err := os.OpenFile("yop-sdk.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+    if err == nil {
+        customLogger := logrus.New()
+        customLogger.SetOutput(logFile)
+        customLogger.SetLevel(logrus.WarnLevel)
+        customLogger.SetFormatter(&logrus.JSONFormatter{})
+        utils.SetLogger(customLogger)
+    }
+}
+```
+
+#### 可用的日志级别
+
+- `logrus.DebugLevel`: 详细的调试信息
+- `logrus.InfoLevel`: 一般信息（默认）
+- `logrus.WarnLevel`: 警告消息
+- `logrus.ErrorLevel`: 仅错误消息
+
+#### 日志输出示例
+
+```go
+// SDK 会自动记录请求信息：
+// time="2023-12-01T10:30:45Z" level=info msg="requestId:abc123-def456"
+// time="2023-12-01T10:30:45Z" level=info msg="authString:yop-auth-v3/..."
+// time="2023-12-01T10:30:45Z" level=info msg="statusCode:200"
 ```
 
 ## 🚨 错误处理

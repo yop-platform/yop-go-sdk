@@ -32,10 +32,10 @@ type YopClient struct {
 }
 
 // Request 普通请求
-func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopResponse, error) {
+func (yopClient *YopClient) Request(request *request.YopRequest) (resp *response.YopResponse, err error) {
 	initRequest(request)
 	var signer = auth.RsaSigner{}
-	err := signer.SignRequest(*request)
+	err = signer.SignRequest(*request)
 	if nil != err {
 		return nil, err
 	}
@@ -60,6 +60,10 @@ func (yopClient *YopClient) Request(request *request.YopRequest) (*response.YopR
 	defer func() {
 		if closeErr := httpResp.Body.Close(); closeErr != nil {
 			utils.Logger.Warnf("Failed to close response body: %v", closeErr)
+			// 只有在没有其他错误时，才将关闭错误作为返回错误
+			if err == nil {
+				err = closeErr
+			}
 		}
 	}()
 	body, err := io.ReadAll(httpResp.Body)

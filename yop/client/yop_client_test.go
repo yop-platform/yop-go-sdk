@@ -135,15 +135,17 @@ func buildDownloadYopRequest() *request.YopRequest {
 
 // TestYopClient_Context_Timeout 测试 context 超时功能
 func TestYopClient_Context_Timeout(t *testing.T) {
-	// 创建一个会超时的请求（使用不存在的服务器）
+	// 创建一个会超时的请求（使用会导致超时的地址）
 	var priKey = request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
 	var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/timeout")
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	yopRequest.PlatformPubKey = platformPub
 	yopRequest.AppId = "app_15958159879157110001"
-	yopRequest.ServerRoot = "http://192.0.2.1:12345" // 使用不可达的 IP 地址
+	// 使用一个会超时的地址：10.255.255.1 是一个保留的不可路由地址
+	// 这会导致真正的超时而不是立即连接失败
+	yopRequest.ServerRoot = "http://10.255.255.1:80"
 	yopRequest.IsvPriKey = priKey
-	yopRequest.Timeout = 1 * time.Second // 设置1秒超时
+	yopRequest.Timeout = 500 * time.Millisecond // 设置较短的超时时间便于测试
 	yopRequest.AddParam("test", "timeout")
 
 	start := time.Now()
@@ -156,8 +158,13 @@ func TestYopClient_Context_Timeout(t *testing.T) {
 	}
 
 	// 验证超时时间大致正确（允许一些误差）
-	if duration < 800*time.Millisecond || duration > 2*time.Second {
-		t.Errorf("Expected timeout around 1 second, but got %v", duration)
+	// 期望在设置的超时时间(500ms)附近，允许一些系统误差
+	expectedTimeout := 500 * time.Millisecond
+	minDuration := expectedTimeout - 100*time.Millisecond  // 400ms
+	maxDuration := expectedTimeout + 200*time.Millisecond  // 700ms
+
+	if duration < minDuration || duration > maxDuration {
+		t.Errorf("Expected timeout between %v and %v, but got %v", minDuration, maxDuration, duration)
 	}
 
 	t.Logf("Request timed out as expected after %v", duration)
