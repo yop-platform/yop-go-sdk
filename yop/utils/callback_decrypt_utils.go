@@ -10,6 +10,7 @@ import (
 	"crypto/aes"
 	"encoding/base64"
 	"errors"
+	"log"
 	"strings"
 )
 
@@ -21,7 +22,7 @@ func DecryptCallback(platformPubKey string, isvPriKey string, callBack string) (
 	}
 	randomKey, err := RsaDecrypt(isvPriKey, cipherText[0])
 	if err != nil {
-		Logger.Println("random key rsa error ", err)
+		log.Println("random key rsa error ", err)
 		return "", err
 	}
 	cipherBytes := base64Decode(cipherText[1])
@@ -42,7 +43,7 @@ func base64Decode(b string) []byte {
 	b = strings.Replace(b, "_", "/", -1)
 	r, err := base64.RawStdEncoding.DecodeString(b)
 	if err != nil {
-		Logger.Println("base64 decode error ", err)
+		log.Println("base64 decode error ", err)
 		return nil
 	}
 

@@ -10,7 +10,6 @@ import (
 	"errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
-	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"net/http"
 	"strconv"
 	"strings"
@@ -67,15 +66,12 @@ type YopErrorResponseAnalyzer struct {
 
 func (yopErrorResponseAnalyzer *YopErrorResponseAnalyzer) Analyze(context RespHandleContext, httpResponse *http.Response) error {
 	var statusCode = httpResponse.StatusCode
-	utils.Logger.Println("statusCode:" + strconv.Itoa(statusCode))
+	log.Println("statusCode:" + strconv.Itoa(statusCode))
 	if statusCode/100 == constants.SC_OK && statusCode != constants.SC_NO_CONTENT {
 		return nil
 	}
 	var yopServiceError = YopServiceError{}
-	err := json.Unmarshal(context.YopResponse.Content, &yopServiceError)
-	if err != nil {
-		return err
-	}
+	json.Unmarshal(context.YopResponse.Content, &yopServiceError)
 	if 0 < len(yopServiceError.Message) {
 		return &yopServiceError
 	}
@@ -87,10 +83,7 @@ type YopJsonResponseAnalyzer struct {
 
 func (yopJsonResponseAnalyzer *YopJsonResponseAnalyzer) Analyze(context RespHandleContext, httpResponse *http.Response) error {
 	if 0 < len(context.YopResponse.Content) && strings.HasPrefix(context.YopResponse.Metadata.ContentType, constants.YOP_HTTP_CONTENT_TYPE_JSON) {
-		err := json.Unmarshal(context.YopResponse.Content, &context.YopResponse)
-		if err != nil {
-			return err
-		}
+		json.Unmarshal(context.YopResponse.Content, &context.YopResponse)
 	}
 	return nil
 }

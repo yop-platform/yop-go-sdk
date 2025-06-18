@@ -58,7 +58,7 @@ func buildGetYopRequest() *request.YopRequest {
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	yopRequest.PlatformPubKey = platformPub
 	yopRequest.AppId = "app_15958159879157110001"
-	yopRequest.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
+	yopRequest.ServerRoot = "https://openapi.yeepay.com/yop-center"
 	yopRequest.IsvPriKey = priKey
 	yopRequest.AddParam("string0", "le1%3D%3D")
 	yopRequest.AddParam("p4", "中文%%")
@@ -73,7 +73,7 @@ func buildJsonYopRequest() *request.YopRequest {
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	result.PlatformPubKey = platformPub
 	result.AppId = "app_15958159879157110001"
-	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
+	result.ServerRoot = "https://openapi.yeepay.com/yop-center"
 	result.IsvPriKey = priKey
 	var params = map[string]any{}
 	params["merchantId"] = "1595815987915711"
@@ -89,7 +89,7 @@ func buildPostFormYopRequest() *request.YopRequest {
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	result.PlatformPubKey = platformPub
 	result.AppId = "app_15958159879157110001"
-	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
+	result.ServerRoot = "https://openapi.yeepay.com/yop-center"
 	result.IsvPriKey = priKey
 	result.AddParam("orderId", "123435234513%")
 	result.AddParam("channel", "WECHAT")
@@ -107,9 +107,9 @@ func buildUploadYopRequest() *request.YopRequest {
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	result.PlatformPubKey = platformPub
 	result.AppId = "app_15958159879157110001"
-	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
+	result.ServerRoot = "https://openapi.yeepay.com/yop-center"
 	result.IsvPriKey = priKey
-	var path = "/Users/yp-21024/go/src/yop-go-sdk/README.md"
+	var path = "../../README.md"
 	f, _ := os.Open(path)
 	result.AddFile("file", f)
 	result.AddParam("string", "ppp")
@@ -122,7 +122,7 @@ func buildDownloadYopRequest() *request.YopRequest {
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	result.PlatformPubKey = platformPub
 	result.AppId = "app_15958159879157110001"
-	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
+	result.ServerRoot = "https://openapi.yeepay.com/yop-center"
 	result.IsvPriKey = priKey
 	result.AddParam("fileName", "wym-test.txt")
 	return result

@@ -23,7 +23,7 @@ func buildYopRequest() *request.YopRequest {
 	var result = request.BuildYopRequest()
 	result.AppId = "app_1234567"
 	result.ApiUri = "/rest/v2.0/yop/platform/certs"
-	result.ServerRoot = "http://ycetest.yeepay.com:30228/yop-center"
+	result.ServerRoot = "https://openapi.yeepay.com/yop-center"
 	result.HttpMethod = "GET"
 	result.IsvPriKey = *priKey
 	result.AddParam("name", "testName")
