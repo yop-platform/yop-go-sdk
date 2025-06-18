@@ -69,17 +69,15 @@ const (
 ### 配置示例
 
 ```go
-var priKey = request.IsvPriKey{Value: "您的私钥内容", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/api/path")
+priKey := request.IsvPriKey{Value: "您的私钥内容", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/api/path")
 yopRequest.AppId = "您的AppId"
 yopRequest.IsvPriKey = priKey
 yopRequest.Timeout = 15 * time.Second // 设置超时时间为 15 秒（可选）
 ```
+## 🚀 使用方法 / 快速开始
 
-## 🚀 用法 / 快速开始
-
-### 引入包
-
+### 导入包
 ```go
 import (
     "github.com/yop-platform/yop-go-sdk/yop/client"
@@ -90,89 +88,71 @@ import (
 ```
 
 ### GET 请求示例
-
 ```go
-var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+priKey := request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
 yopRequest.AddParam("paramName", "paramValue")
 yopResp, err := client.DefaultClient.Request(yopRequest)
 if nil != err{
-    // request failed
+    // 请求失败
 }
-//yopResp.Result为请求结果
+// yopResp.Result 是请求结果
 ```
-
 ### POST Form 请求示例
 
 ```go
-var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+priKey := request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
 yopRequest.AddParam("paramName", "paramValue")
 yopResp, err := client.DefaultClient.Request(yopRequest)
-if nil != err{ 
-    // request failed
+if nil != err{
+    // 请求失败
 }
-//yopResp.Result为请求结果
+// yopResp.Result 是请求结果
 ```
-
 ### POST JSON 请求示例
 
 ```go
-var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+priKey := request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
-// 设置json请求报文
-var params = map[string]any{}
+// 设置 JSON 请求载荷
+params := map[string]any{}
 params["merchantId"] = "1595815987915711"
 params["requestId"] = "requestId"
 yopRequest.Content = utils.ParseToJsonStr(params)
 
 yopResp, err := client.DefaultClient.Request(yopRequest)
-if nil != err{ 
-    // request failed
+if nil != err{
+    // 请求失败
 }
-//yopResp.Result为请求结果
+// yopResp.Result 是请求结果
 ```
-
 ### 文件上传请求示例
 
 ```go
-var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+priKey := request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
 yopRequest.AddFile("file", f)
 yopResp, err := client.DefaultClient.Request(yopRequest)
-if nil != err{ 
-    // request failed
+if nil != err{
+    // 请求失败
 }
-// yopResp.Result为上传请求结果
+// yopResp.Result 是上传请求结果
 ```
 
 ### 文件下载请求示例
 
 ```go
-var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
-yopRequest.AppId = "appId"
-yopRequest.IsvPriKey = priKey
-yopRequest.AddParam("paramName", "paramValue")
-yopResp, err := client.DefaultClient.Request(yopRequest)
-if nil != err{ 
-    // request failed
-}
-// yopResp.Content为文件内容
-```
-
-### 回调处理示例
-
-```go
-//utils.DecryptCallback
+priKey := request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 
 var callback = "Ars6jASSiylO70_VJDQ5SFU1zQwaI36kG5WhlSKHjkGdU3fEVEkkbhvAxKjOTUiw9vF7RMnmGKQQWAuV8jCKaOpMNjIEMHehBaPASwTiEE946CcbOeoNILGHf0o20xj2gqqvkQToFXEMNiic7bcYbfi0PxIrR6loBZnW-m5bqzB5RXLibiSjGlmr5CDnxV4tZXmYlkkeN2BcT4msWjfCtuaTMK_fN77WJcCMlW7ffqiN5yIOeqB4QBb5lOnClTRW4DThKPOMkXupAM2AnPxTkDp4n9lh-SK56zLuafk1bQhWUNcS9L4YEKZGJIjP7DY20TAWEr3yXo8w0w0VtB13Ig$Xf6fETKWcLTudBh2HluGSQTqhBRJa6EXHhXlMryWW8Y384RjVwIfpQm19RmTgkoqRc2tNcTWxRIW6itIS62DrzixlqRa099jx21uGqt8FCpvdWwnwlC16SgkeU_5NnrpjA_WQ0XW9RhNxzuQmwfxHGbtnth4vNXWswcSm23j3KQaXFjVP5Ws1uYVCxYSLMxqJE7a56DNWONGcGJJsc0KTCc7cdfr8n24emAaPCNteIG2RM8F17pRxY5yVnguTSZPXmhBlyI25xS7rciWzKZLp2Kfh_JCivABbA-_5Vf3VWPmjITs-TR5HlGVFbnT0eOUMUepXUemjjP8R0f8cBeH2NKej6QjQL99tvlrrxg_QfmezE0WTCITCNDBhpbHiq90lFyLjwlWNDTRo8rhjouSlMA9Ae_b-B4eZorDRVxw3BWywdyo2FzNk-dUDeBVaIth9YsaMGsq9XivGjlnnx3YEVfEtuVSvEm1xBdYsTHcM02nMwZb8Ze2WL1kIFo8IFM0$AES$SHA256"
 // 此处为测试数据，正式使用是请使用真实的平台公钥
@@ -181,35 +161,35 @@ var isvPriKey = "<私钥文本>"
 
 content, err := utils.DecryptCallback(platformPubKey, isvPriKey, callback)
 if nil != err {
-    //"decrypt failed"
+    // 解密失败
 }
 ```
 
 ### 签名操作示例
 
 ```go
-//utils.RsaSignBase64
+// utils.RsaSignBase64
 
-// 此处为测试数据，正式使用是请使用真实的私钥
-var priKey = "<私钥文本>"
-var content = "a=123！@#¥%……中文"
-signature, error := utils.RsaSignBase64(content, priKey, crypto.SHA256)
-if nil != error {
-    //sign error
+// 此处为测试数据，正式使用时请使用真实的私钥
+priKey := "<私钥文本>"
+content := "a=123！@#¥%……中文"
+signature, err := utils.RsaSignBase64(content, priKey, crypto.SHA256)
+if nil != err {
+    // 签名错误
 }
 ```
 
 ### 验证签名示例
 
 ```go
-//utils.VerifySign
+// utils.VerifySign
 
 // 此处为测试数据
-var pubKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwRwXR20F7D0/hKQISwPZNkOTvBiwgFBS1mAee1IXOGTWtmFIY60xbxWTBULjI2lYHZhRk76nxmFEAUZXRxYX/ZLl3+Sz2/ptASf0eQFgsk3F+wx6LqBjgzH8ZAma4piC8GFg5MIWEx6+YRFefJxkULRziFQeWuIv8uGdb719TCIwPvDid86WsVypI/uOjrX5o5aFDxhUs8/q6q0UbTKmHjy5FmdCfgpiFzNSsJf5IGFKv2BkmMvUOb06IzfVgSs5O3rjqAnLFrUawUMrHcjN8gz144Z18extJ4dO4UlIfqzA2e2bLdJVUKJf+5D18zcIenlJkRmPZX67iDEuZINcnQIDAQAB"
-var signature = "glTZg6lLl6oV4Ho15fAUegcVILlTwYJkbZO_Iz8AYUKTZ_1JP4AqAqSdm3GqjaukoNrDkxPGv2WW8plxYxtzsXjkzWiCMth5aShHgA7a9SXW0jfo365KPyVj0zFO2QIV9odHEnY1apwcAxvr54j4d5SHoC3vKUczZ20txTsNjcG9ifi1AoJhblILxKL2NO0tdIzTMQCRaBdOXUOdnL7RgP1qPew5yJT4e1QdtTjkirCKJurm4SumOA3Uroz-G-9MUZgiTkU4RXrEvu-rJPlqfJPsITYoWLsuPy1Gfne_5j-IgChXpoHacI0s-NlzKmyjsFt3-5aUYDd0cFw58ErUXw"
-var data = "{\"result\":{\"requestId\":\"requestId\",\"errorMsg\":\"exception.record.not.found.transferDomesticOrder|merchantId:[null],requestId:[requestId]\",\"status\":\"FAILED\"}}"
+pubKey := "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwRwXR20F7D0/hKQISwPZNkOTvBiwgFBS1mAee1IXOGTWtmFIY60xbxWTBULjI2lYHZhRk76nxmFEAUZXRxYX/ZLl3+Sz2/ptASf0eQFgsk3F+wx6LqBjgzH8ZAma4piC8GFg5MIWEx6+YRFefJxkULRziFQeWuIv8uGdb719TCIwPvDid86WsVypI/uOjrX5o5aFDxhUs8/q6q0UbTKmHjy5FmdCfgpiFzNSsJf5IGFKv2BkmMvUOb06IzfVgSs5O3rjqAnLFrUawUMrHcjN8gz144Z18extJ4dO4UlIfqzA2e2bLdJVUKJf+5D18zcIenlJkRmPZX67iDEuZINcnQIDAQAB"
+signature := "glTZg6lLl6oV4Ho15fAUegcVILlTwYJkbZO_Iz8AYUKTZ_1JP4AqAqSdm3GqjaukoNrDkxPGv2WW8plxYxtzsXjkzWiCMth5aShHgA7a9SXW0jfo365KPyVj0zFO2QIV9odHEnY1apwcAxvr54j4d5SHoC3vKUczZ20txTsNjcG9ifi1AoJhblILxKL2NO0tdIzTMQCRaBdOXUOdnL7RgP1qPew5yJT4e1QdtTjkirCKJurm4SumOA3Uroz-G-9MUZgiTkU4RXrEvu-rJPlqfJPsITYoWLsuPy1Gfne_5j-IgChXpoHacI0s-NlzKmyjsFt3-5aUYDd0cFw58ErUXw"
+data := "{\"result\":{\"requestId\":\"requestId\",\"errorMsg\":\"exception.record.not.found.transferDomesticOrder|merchantId:[null],requestId:[requestId]\",\"status\":\"FAILED\"}}"
 if !utils.VerifySign(data, signature, pubKey, crypto.SHA256) {
-     //verify failed
+     // 验证失败
 }
 ```
 

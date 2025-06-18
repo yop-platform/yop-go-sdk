@@ -69,8 +69,8 @@ const (
 ### Configuration Example
 
 ```go
-var priKey = request.IsvPriKey{Value: "Your private key content", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/api/path")
+priKey := request.IsvPriKey{Value: "Your private key content", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/api/path")
 yopRequest.AppId = "Your AppId"
 yopRequest.IsvPriKey = priKey
 yopRequest.Timeout = 15 * time.Second // Set timeout to 15 seconds (optional)
@@ -92,8 +92,8 @@ import (
 ### GET Request Example
 
 ```go
-var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+priKey := request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
 yopRequest.AddParam("paramName", "paramValue")
@@ -107,8 +107,8 @@ if nil != err{
 ### POST Form Request Example
 
 ```go
-var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+priKey := request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
 yopRequest.AddParam("paramName", "paramValue")
@@ -122,12 +122,12 @@ if nil != err{
 ### POST JSON Request Example
 
 ```go
-var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+priKey := request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
 // Set JSON request payload
-var params = map[string]any{}
+params := map[string]any{}
 params["merchantId"] = "1595815987915711"
 params["requestId"] = "requestId"
 yopRequest.Content = utils.ParseToJsonStr(params)
@@ -142,8 +142,8 @@ if nil != err{
 ### File Upload Request Example
 
 ```go
-var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+priKey := request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
 yopRequest.AddFile("file", f)
@@ -157,8 +157,8 @@ if nil != err{
 ### File Download Request Example
 
 ```go
-var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+priKey := request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
 yopRequest.AddParam("paramName", "paramValue")
@@ -193,8 +193,8 @@ if nil != err {
 // This is test data, please use the real private key for production
 var priKey = "<Private Key Text>"
 var content = "a=123！@#¥%……Chinese"
-signature, error := utils.RsaSignBase64(content, priKey, crypto.SHA256)
-if nil != error {
+signature, err := utils.RsaSignBase64(content, priKey, crypto.SHA256)
+if nil != err {
     //sign error
 }
 ```

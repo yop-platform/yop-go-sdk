@@ -4,7 +4,7 @@ This directory contains example code demonstrating how to use the YOP Go SDK.
 
 ## Examples
 
-### 1. Basic Usage (`basic_usage.go`)
+### 1. Basic Usage (`basic/main.go`)
 
 Demonstrates the fundamental operations:
 - GET requests with query parameters
@@ -13,11 +13,11 @@ Demonstrates the fundamental operations:
 
 **Run the example:**
 ```bash
-cd examples
-go run basic_usage.go
+cd examples/basic
+go run main.go
 ```
 
-### 2. Advanced Usage (`advanced_usage.go`)
+### 2. Advanced Usage (`advanced/main.go`)
 
 Shows advanced features and best practices:
 - Custom HTTP client configuration
@@ -29,8 +29,8 @@ Shows advanced features and best practices:
 
 **Run the example:**
 ```bash
-cd examples
-go run advanced_usage.go
+cd examples/advanced
+go run main.go
 ```
 
 ## Configuration
