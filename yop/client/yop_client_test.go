@@ -160,8 +160,8 @@ func TestYopClient_Context_Timeout(t *testing.T) {
 	// 验证超时时间大致正确（允许一些误差）
 	// 期望在设置的超时时间(500ms)附近，允许一些系统误差
 	expectedTimeout := 500 * time.Millisecond
-	minDuration := expectedTimeout - 100*time.Millisecond  // 400ms
-	maxDuration := expectedTimeout + 200*time.Millisecond  // 700ms
+	minDuration := expectedTimeout - 100*time.Millisecond // 400ms
+	maxDuration := expectedTimeout + 200*time.Millisecond // 700ms
 
 	if duration < minDuration || duration > maxDuration {
 		t.Errorf("Expected timeout between %v and %v, but got %v", minDuration, maxDuration, duration)
