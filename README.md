@@ -1,9 +1,19 @@
 # YOP Go SDK
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/yop-platform/yop-go-sdk.svg)](https://pkg.go.dev/github.com/yop-platform/yop-go-sdk)
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+<div align="center">
 
-[阅读中文文档](README_zh-CN.md)
+[![Go Reference](https://pkg.go.dev/badge/github.com/yop-platform/yop-go-sdk.svg)](https://pkg.go.dev/github.com/yop-platform/yop-go-sdk)
+[![CI/CD](https://github.com/yop-platform/yop-go-sdk/workflows/CI%2FCD/badge.svg)](https://github.com/yop-platform/yop-go-sdk/actions)
+[![Go Report Card](https://goreportcard.com/badge/github.com/yop-platform/yop-go-sdk)](https://goreportcard.com/report/github.com/yop-platform/yop-go-sdk)
+[![codecov](https://codecov.io/gh/yop-platform/yop-go-sdk/branch/main/graph/badge.svg)](https://codecov.io/gh/yop-platform/yop-go-sdk)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![GitHub release](https://img.shields.io/github/release/yop-platform/yop-go-sdk.svg)](https://github.com/yop-platform/yop-go-sdk/releases)
+[![Go version](https://img.shields.io/github/go-mod/go-version/yop-platform/yop-go-sdk)](https://github.com/yop-platform/yop-go-sdk)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/yop-platform/yop-typescript-sdk)
+
+English | [中文](README_zh-CN.md)
+
+</div>
 
 A Go SDK specifically designed for seamless interaction with YOP (YeePay Open Platform) APIs.
 
@@ -28,7 +38,11 @@ This SDK provides a convenient way to integrate YeePay payment and other service
 Install this package using Go modules:
 
 ```bash
+# Install latest version
 go get github.com/yop-platform/yop-go-sdk
+
+# Install specific version
+go get github.com/yop-platform/yop-go-sdk@v1.4.40
 ```
 
 ## ⚙️ Configuration
@@ -55,11 +69,11 @@ const (
 ### Configuration Example
 
 ```go
-var priKey = &request.IsvPriKey{Value: "Your private key content", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/api/path")
+priKey := request.IsvPriKey{Value: "Your private key content", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/api/path")
 yopRequest.AppId = "Your AppId"
 yopRequest.IsvPriKey = priKey
-yopRequest.Timeout = 15 // Set timeout to 15 seconds (optional)
+yopRequest.Timeout = 15 * time.Second // Set timeout to 15 seconds (optional)
 ```
 
 ## 🚀 Usage / Quick Start
@@ -78,8 +92,8 @@ import (
 ### GET Request Example
 
 ```go
-var priKey = &request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+priKey := request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
 yopRequest.AddParam("paramName", "paramValue")
@@ -93,8 +107,8 @@ if nil != err{
 ### POST Form Request Example
 
 ```go
-var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+priKey := request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
 yopRequest.AddParam("paramName", "paramValue")
@@ -108,15 +122,15 @@ if nil != err{
 ### POST JSON Request Example
 
 ```go
-var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+priKey := request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
 // Set JSON request payload
-var params = map[string]any{}
+params := map[string]any{}
 params["merchantId"] = "1595815987915711"
 params["requestId"] = "requestId"
-result.Content = utils.ParseToJsonStr(params)
+yopRequest.Content = utils.ParseToJsonStr(params)
 
 yopResp, err := client.DefaultClient.Request(yopRequest)
 if nil != err{ 
@@ -128,11 +142,11 @@ if nil != err{
 ### File Upload Request Example
 
 ```go
-var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+priKey := request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
-result.AddFile("file", f)
+yopRequest.AddFile("file", f)
 yopResp, err := client.DefaultClient.Request(yopRequest)
 if nil != err{ 
     // request failed
@@ -143,8 +157,8 @@ if nil != err{
 ### File Download Request Example
 
 ```go
-var priKey = request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
-var yopRequest = request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
+priKey := request.IsvPriKey{Value: "isvPriKey", CertType: request.RSA2048}
+yopRequest := request.NewYopRequest(constants.GET_HTTP_METHOD, "/rest/v1.0/test/product-query/query-for-doc")
 yopRequest.AppId = "appId"
 yopRequest.IsvPriKey = priKey
 yopRequest.AddParam("paramName", "paramValue")
@@ -179,8 +193,8 @@ if nil != err {
 // This is test data, please use the real private key for production
 var priKey = "<Private Key Text>"
 var content = "a=123！@#¥%……Chinese"
-signature, error := utils.RsaSignBase64(content, priKey, crypto.SHA256)
-if nil != error {
+signature, err := utils.RsaSignBase64(content, priKey, crypto.SHA256)
+if nil != err {
     //sign error
 }
 ```
@@ -240,9 +254,276 @@ if !utils.VerifySign(data, signature, pubKey, crypto.SHA256) {
 - `utils.RsaSignBase64(content, priKey string, hash crypto.Hash) (string, error)`: Generate signature
 - `utils.VerifySign(data, signature, pubKey string, hash crypto.Hash) bool`: Verify signature
 
+## 🔧 Advanced Configuration
+
+### Environment Configuration
+
+The SDK supports multiple environment configurations:
+
+```go
+// Production environment (default)
+yopRequest.ServerRoot = "https://openapi.yeepay.com/yop-center"
+
+// Test environment
+yopRequest.ServerRoot = "https://ycetest.yeepay.com:30228/yop-center"
+
+// YOS file service
+yopRequest.ServerRoot = "https://yos.yeepay.com/yop-center"
+```
+
+### Custom HTTP Client
+
+```go
+import (
+    "net/http"
+    "time"
+)
+
+// Create custom HTTP client
+customClient := &http.Client{
+    Timeout: 30 * time.Second,
+    Transport: &http.Transport{
+        MaxIdleConns:        100,
+        MaxIdleConnsPerHost: 10,
+        IdleConnTimeout:     90 * time.Second,
+    },
+}
+
+// Use custom client
+yopClient := client.YopClient{Client: customClient}
+yopResp, err := yopClient.Request(yopRequest)
+```
+
+### Logging Configuration
+
+The SDK provides a unified logging system that can be easily configured:
+
+```go
+import (
+    "os"
+    "github.com/yop-platform/yop-go-sdk/yop/utils"
+    "github.com/sirupsen/logrus"
+)
+
+// Basic logging configuration
+// Set log level (Debug, Info, Warn, Error)
+utils.SetLogLevel(logrus.InfoLevel)
+
+// Disable logging completely
+utils.DisableLogging()
+
+// Re-enable logging
+utils.EnableLogging()
+
+// Custom logger configuration
+customLogger := logrus.New()
+customLogger.SetOutput(os.Stdout)
+customLogger.SetLevel(logrus.DebugLevel)
+customLogger.SetFormatter(&logrus.JSONFormatter{})
+utils.SetLogger(customLogger)
+
+// Set custom formatter
+utils.SetLogFormatter(&logrus.JSONFormatter{
+    TimestampFormat: "2006-01-02 15:04:05",
+})
+
+// Example: Production logging setup
+func setupProductionLogging() {
+    // Use structured JSON logging for production
+    utils.SetLogFormatter(&logrus.JSONFormatter{
+        TimestampFormat: "2006-01-02T15:04:05.000Z",
+    })
+
+    // Set appropriate log level
+    utils.SetLogLevel(logrus.WarnLevel)
+
+    // Optional: Log to file instead of stdout
+    logFile, err := os.OpenFile("yop-sdk.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+    if err == nil {
+        customLogger := logrus.New()
+        customLogger.SetOutput(logFile)
+        customLogger.SetLevel(logrus.WarnLevel)
+        customLogger.SetFormatter(&logrus.JSONFormatter{})
+        utils.SetLogger(customLogger)
+    }
+}
+```
+
+#### Available Log Levels
+
+- `logrus.DebugLevel`: Detailed debug information
+- `logrus.InfoLevel`: General information (default)
+- `logrus.WarnLevel`: Warning messages
+- `logrus.ErrorLevel`: Error messages only
+
+#### Log Output Examples
+
+```go
+// The SDK will automatically log request information:
+// time="2023-12-01T10:30:45Z" level=info msg="requestId:abc123-def456"
+// time="2023-12-01T10:30:45Z" level=info msg="authString:yop-auth-v3/..."
+// time="2023-12-01T10:30:45Z" level=info msg="statusCode:200"
+```
+
+## 🚨 Error Handling
+
+### Common Error Types
+
+```go
+yopResp, err := client.DefaultClient.Request(yopRequest)
+if err != nil {
+    // Network error or request building error
+    log.Printf("Request failed: %v", err)
+    return
+}
+
+// Check business errors
+if yopResp.Result != nil {
+    result := yopResp.Result.(map[string]interface{})
+    if status, ok := result["status"]; ok && status != "SUCCESS" {
+        log.Printf("Business error: %v", result["errorMsg"])
+        return
+    }
+}
+```
+
+### Retry Mechanism
+
+```go
+func requestWithRetry(yopRequest *request.YopRequest, maxRetries int) (*response.YopResponse, error) {
+    var lastErr error
+
+    for i := 0; i <= maxRetries; i++ {
+        yopResp, err := client.DefaultClient.Request(yopRequest)
+        if err == nil {
+            return yopResp, nil
+        }
+
+        lastErr = err
+        if i < maxRetries {
+            time.Sleep(time.Duration(i+1) * time.Second) // Exponential backoff
+        }
+    }
+
+    return nil, fmt.Errorf("request failed after %d retries: %v", maxRetries, lastErr)
+}
+```
+
+## 📊 Performance Optimization
+
+### Connection Pool Configuration
+
+```go
+// Optimize HTTP transport configuration
+transport := &http.Transport{
+    MaxIdleConns:        100,
+    MaxIdleConnsPerHost: 10,
+    IdleConnTimeout:     90 * time.Second,
+    TLSHandshakeTimeout: 10 * time.Second,
+}
+
+customClient := &http.Client{
+    Transport: transport,
+    Timeout:   30 * time.Second,
+}
+```
+
+### Batch Request Processing
+
+```go
+func processBatchRequests(requests []*request.YopRequest) {
+    const maxConcurrency = 10
+    semaphore := make(chan struct{}, maxConcurrency)
+    var wg sync.WaitGroup
+
+    for _, req := range requests {
+        wg.Add(1)
+        go func(r *request.YopRequest) {
+            defer wg.Done()
+            semaphore <- struct{}{} // Acquire semaphore
+            defer func() { <-semaphore }() // Release semaphore
+
+            resp, err := client.DefaultClient.Request(r)
+            if err != nil {
+                log.Printf("Request failed: %v", err)
+                return
+            }
+            // Process response...
+        }(req)
+    }
+
+    wg.Wait()
+}
+```
+
+## 🧪 Testing
+
+### Unit Tests
+
+```bash
+# Run all tests
+go test ./...
+
+# Run tests with coverage
+go test -cover ./...
+
+# Generate coverage report
+go test -coverprofile=coverage.out ./...
+go tool cover -html=coverage.out -o coverage.html
+```
+
+### Benchmarks
+
+```bash
+# Run benchmarks
+go test -bench=. ./...
+
+# Run benchmarks with memory allocation stats
+go test -bench=. -benchmem ./...
+```
+
 ## 🤝 Contributing
 
-Contributions are welcome! If you find any issues or have suggestions for improvements, please submit an issue or pull request.
+We welcome all forms of contributions! Please read the following guidelines before contributing:
+
+### Development Environment Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yop-platform/yop-go-sdk.git
+   cd yop-go-sdk
+   ```
+
+2. **Install dependencies**
+   ```bash
+   go mod download
+   ```
+
+3. **Run tests**
+   ```bash
+   go test ./...
+   ```
+
+4. **Format code**
+   ```bash
+   go fmt ./...
+   goimports -w .
+   ```
+
+### Commit Guidelines
+
+- Use clear commit messages
+- Follow [Conventional Commits](https://www.conventionalcommits.org/) specification
+- Ensure all tests pass
+- Add necessary test cases
+
+### Pull Request Process
+
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Create a Pull Request
 
 ---
 

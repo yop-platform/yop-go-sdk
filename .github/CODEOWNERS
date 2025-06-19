@@ -1,0 +1,26 @@
+# Global owners
+* @yop-platform/maintainers
+
+# Documentation
+*.md @yop-platform/docs-team
+docs/ @yop-platform/docs-team
+
+# GitHub workflows and configuration
+.github/ @yop-platform/devops-team
+
+# Go source code
+*.go @yop-platform/go-team
+go.mod @yop-platform/go-team
+go.sum @yop-platform/go-team
+
+# Core modules
+yop/auth/ @yop-platform/security-team
+yop/client/ @yop-platform/core-team
+yop/utils/ @yop-platform/core-team
+
+# Configuration files
+.golangci.yml @yop-platform/devops-team
+.gitignore @yop-platform/devops-team
+
+# License and legal
+LICENSE @yop-platform/legal-team

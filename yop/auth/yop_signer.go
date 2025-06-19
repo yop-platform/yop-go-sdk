@@ -9,15 +9,15 @@ import (
 	"crypto"
 	"crypto/sha256"
 	"fmt"
-	log "github.com/sirupsen/logrus"
-	"github.com/yop-platform/yop-go-sdk/yop/constants"
-	"github.com/yop-platform/yop-go-sdk/yop/request"
-	"github.com/yop-platform/yop-go-sdk/yop/utils"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/yop-platform/yop-go-sdk/yop/constants"
+	"github.com/yop-platform/yop-go-sdk/yop/request"
+	"github.com/yop-platform/yop-go-sdk/yop/utils"
 )
 
 var FormatISOTime = "2006-01-02T15:04:05Z"
@@ -34,30 +34,26 @@ type YopSigner interface {
 type RsaSigner struct {
 }
 
-func init() {
-	log.SetLevel(log.InfoLevel)
-}
-
 func (signer *RsaSigner) SignRequest(yopRequest request.YopRequest) error {
 	var authString = buildAuthString(yopRequest.AppId)
-	log.Println("authString:" + authString)
+	utils.Logger.Info("authString:" + authString)
 
 	var contentHash = calculateContentHash(yopRequest)
-	log.Println("contentHash:" + contentHash)
+	utils.Logger.Info("contentHash:" + contentHash)
 	yopRequest.Headers[constants.YOP_CONTENT_SHA256] = contentHash
 
 	var headerToSign = getHeaderToSign(yopRequest)
 	var canonicalRequest = buildCanonicalRequest(yopRequest, authString, headerToSign)
-	log.Println("canonicalRequest:" + canonicalRequest)
+	utils.Logger.Info("canonicalRequest:" + canonicalRequest)
 
 	signature, err := utils.RsaSignBase64(canonicalRequest, yopRequest.IsvPriKey.Value, crypto.SHA256)
 	if nil != err {
 		return err
 	}
 	signature += "$" + "SHA256"
-	log.Println("signature:" + signature)
+	utils.Logger.Info("signature:" + signature)
 	var authorizationHeader = buildAuthzHeader(authString, signature, headerToSign)
-	log.Println("Authorization:" + authorizationHeader)
+	utils.Logger.Info("Authorization:" + authorizationHeader)
 	yopRequest.Headers[constants.AUTHORIZATION] = authorizationHeader
 	return nil
 }
@@ -70,12 +66,12 @@ func (signer *RsaSigner) VerifyResponse(content string, signature string, pubKey
 
 func calculateContentHash(yopRequest request.YopRequest) string {
 	var encodedParameters = ""
-	if utils.UsePayloadForQueryParameters(yopRequest) {
+	if request.UsePayloadForQueryParameters(yopRequest) {
 		encodedParameters = utils.GetCanonicalQueryString(yopRequest.Params)
 	} else {
 		encodedParameters = yopRequest.Content
 	}
-	log.Println("encodedParameters:" + encodedParameters)
+	utils.Logger.Info("encodedParameters:" + encodedParameters)
 	return fmt.Sprintf("%x", sha256.Sum256([]byte(encodedParameters)))
 }
 
@@ -90,14 +86,14 @@ func buildAuthString(appId string) string {
 }
 
 func getCanonicalQueryString(yopRequest request.YopRequest) string {
-	if utils.UsePayloadForQueryParameters(yopRequest) {
+	if request.UsePayloadForQueryParameters(yopRequest) {
 		return ""
 	}
 	return utils.GetCanonicalQueryString(yopRequest.Params)
 }
 
 func getCanonicalURIPath(path string) string {
-	if 0 == len(path) {
+	if len(path) == 0 {
 		return "/"
 	} else if strings.HasPrefix(path, "/") {
 		return utils.NormalizePath(path)
@@ -110,7 +106,7 @@ func getHeaderToSign(yopRequest request.YopRequest) []string {
 	var result []string
 	for header := range DEFAULT_HEADERS_TO_SIGN {
 		var value = yopRequest.Headers[DEFAULT_HEADERS_TO_SIGN[header]]
-		if 0 != len(value) {
+		if len(value) != 0 {
 			result = append(result, DEFAULT_HEADERS_TO_SIGN[header])
 		}
 	}

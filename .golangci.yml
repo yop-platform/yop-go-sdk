@@ -1,0 +1,80 @@
+# golangci-lint configuration for YOP Go SDK
+# Simplified configuration to avoid version compatibility issues
+
+run:
+  timeout: 5m
+  issues-exit-code: 1
+  tests: true
+  modules-download-mode: readonly
+  allow-parallel-runners: true
+
+output:
+  formats:
+    - format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+
+linters-settings:
+  govet:
+    enable:
+      - shadow
+  goimports:
+    local-prefixes: github.com/yop-platform/yop-go-sdk
+  misspell:
+    locale: US
+  lll:
+    line-length: 140
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - gofmt
+    - goimports
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - staticcheck
+    - typecheck
+    - unused
+
+issues:
+  exclude-rules:
+    # Ignore naming convention issues for existing constants
+    - path: constants/constants\.go
+      linters:
+        - revive
+        - stylecheck
+      text: "(should not use ALL_CAPS|package comment should be of the form|exported.*should have comment)"
+
+    # Exclude test files from certain linters
+    - path: _test\.go
+      linters:
+        - errcheck
+        - gosec
+
+    # Exclude Go standard library issues
+    - path: ".*/(go|src)/.*"
+      linters:
+        - typecheck
+        - staticcheck
+
+  exclude-dirs:
+    - vendor
+    - examples
+    - .git
+
+  exclude-files:
+    - ".*\\.pb\\.go$"
+    - ".*/go/src/.*"
+    - ".*/go/pkg/.*"
+
+  # Only check files in our project
+  include:
+    - "^yop/.*\\.go$"
+
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  new: false
+  fix: false

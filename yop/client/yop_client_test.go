@@ -6,13 +6,14 @@
 package client
 
 import (
+	"os"
+	"testing"
+	"time"
+
 	"github.com/yop-platform/yop-go-sdk/yop/constants"
 	"github.com/yop-platform/yop-go-sdk/yop/request"
 	"github.com/yop-platform/yop-go-sdk/yop/response"
 	"github.com/yop-platform/yop-go-sdk/yop/utils"
-	"os"
-	"testing"
-	"time"
 )
 
 func TestYopClient_GET_Request(t *testing.T) {
@@ -58,7 +59,6 @@ func buildGetYopRequest() *request.YopRequest {
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	yopRequest.PlatformPubKey = platformPub
 	yopRequest.AppId = "app_15958159879157110001"
-	yopRequest.ServerRoot = "https://openapi.yeepay.com/yop-center"
 	yopRequest.IsvPriKey = priKey
 	yopRequest.AddParam("string0", "le1%3D%3D")
 	yopRequest.AddParam("p4", "中文%%")
@@ -73,7 +73,6 @@ func buildJsonYopRequest() *request.YopRequest {
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	result.PlatformPubKey = platformPub
 	result.AppId = "app_15958159879157110001"
-	result.ServerRoot = "https://openapi.yeepay.com/yop-center"
 	result.IsvPriKey = priKey
 	var params = map[string]any{}
 	params["merchantId"] = "1595815987915711"
@@ -89,7 +88,6 @@ func buildPostFormYopRequest() *request.YopRequest {
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	result.PlatformPubKey = platformPub
 	result.AppId = "app_15958159879157110001"
-	result.ServerRoot = "https://openapi.yeepay.com/yop-center"
 	result.IsvPriKey = priKey
 	result.AddParam("orderId", "123435234513%")
 	result.AddParam("channel", "WECHAT")
@@ -103,15 +101,23 @@ func buildPostFormYopRequest() *request.YopRequest {
 
 func buildUploadYopRequest() *request.YopRequest {
 	var priKey = request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
-	var result = request.NewYopRequest(constants.POST_HTTP_METHOD, "app_15958159879157110001")
+	var result = request.NewYopRequest(constants.POST_HTTP_METHOD, "/yos/v1.0/test/upload")
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	result.PlatformPubKey = platformPub
 	result.AppId = "app_15958159879157110001"
-	result.ServerRoot = "https://openapi.yeepay.com/yop-center"
 	result.IsvPriKey = priKey
+
+	// 使用当前环境中存在的文件路径
 	var path = "../../README.md"
-	f, _ := os.Open(path)
-	result.AddFile("file", f)
+	f, err := os.Open(path)
+	if err != nil {
+		// 如果文件打开失败，记录错误但不添加文件
+		utils.Logger.Warn("Failed to open file:", err)
+	} else {
+		// 只有在文件成功打开时才添加到请求中
+		result.AddFile("file", f)
+	}
+
 	result.AddParam("string", "ppp")
 	return result
 }
@@ -122,8 +128,44 @@ func buildDownloadYopRequest() *request.YopRequest {
 	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
 	result.PlatformPubKey = platformPub
 	result.AppId = "app_15958159879157110001"
-	result.ServerRoot = "https://openapi.yeepay.com/yop-center"
 	result.IsvPriKey = priKey
 	result.AddParam("fileName", "wym-test.txt")
 	return result
+}
+
+// TestYopClient_Context_Timeout 测试 context 超时功能
+func TestYopClient_Context_Timeout(t *testing.T) {
+	// 创建一个会超时的请求（使用会导致超时的地址）
+	var priKey = request.IsvPriKey{Value: isvPriKey, CertType: request.RSA2048}
+	var yopRequest = request.NewYopRequest(constants.POST_HTTP_METHOD, "/rest/v1.0/test/timeout")
+	var platformPub = request.PlatformPubKey{Value: platformPubKey, CertType: request.RSA2048}
+	yopRequest.PlatformPubKey = platformPub
+	yopRequest.AppId = "app_15958159879157110001"
+	// 使用一个会超时的地址：10.255.255.1 是一个保留的不可路由地址
+	// 这会导致真正的超时而不是立即连接失败
+	yopRequest.ServerRoot = "http://10.255.255.1:80"
+	yopRequest.IsvPriKey = priKey
+	yopRequest.Timeout = 500 * time.Millisecond // 设置较短的超时时间便于测试
+	yopRequest.AddParam("test", "timeout")
+
+	start := time.Now()
+	_, err := DefaultClient.Request(yopRequest)
+	duration := time.Since(start)
+
+	// 验证请求确实超时了
+	if err == nil {
+		t.Error("Expected timeout error, but got nil")
+	}
+
+	// 验证超时时间大致正确（允许一些误差）
+	// 期望在设置的超时时间(500ms)附近，允许一些系统误差
+	expectedTimeout := 500 * time.Millisecond
+	minDuration := expectedTimeout - 100*time.Millisecond // 400ms
+	maxDuration := expectedTimeout + 200*time.Millisecond // 700ms
+
+	if duration < minDuration || duration > maxDuration {
+		t.Errorf("Expected timeout between %v and %v, but got %v", minDuration, maxDuration, duration)
+	}
+
+	t.Logf("Request timed out as expected after %v", duration)
 }

@@ -8,14 +8,14 @@ package request
 import (
 	"encoding/json"
 	"fmt"
-	uuid "github.com/satori/go.uuid"
 	"html/template"
-	"log"
 	"os"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/yop-platform/yop-go-sdk/yop/utils"
 )
 
 const (
@@ -86,18 +86,21 @@ type PlatformPubKey struct {
 func BuildYopRequest() *YopRequest {
 	var isvPriKey = IsvPriKey{CertType: RSA2048}
 	var platformCert = PlatformPubKey{Value: YOP_PLATFORM_PUBLIC_KEY, CertType: RSA2048}
-	return &YopRequest{RequestId: uuid.NewV4().String(), IsvPriKey: isvPriKey, PlatformPubKey: platformCert, Params: map[string][]string{}, Headers: map[string]string{}, Files: map[string]*os.File{}}
+	var requestId = utils.GenerateRequestID()
+
+	return &YopRequest{RequestId: requestId, IsvPriKey: isvPriKey, PlatformPubKey: platformCert, Params: map[string][]string{}, Headers: map[string]string{}, Files: map[string]*os.File{}, Timeout: 10 * time.Second}
 }
 
 func (request *YopRequest) HandleServerRoot() {
-	if 0 != len(request.ServerRoot) {
+	if len(request.ServerRoot) != 0 {
 		return
 	}
 
-	if 0 != len(request.ApiUri) || strings.HasPrefix(request.ApiUri, "/yos") {
+	if strings.HasPrefix(request.ApiUri, "/yos") {
 		request.ServerRoot = YOS_SERVER_ROOT
+	} else {
+		request.ServerRoot = SERVER_ROOT
 	}
-	request.ServerRoot = SERVER_ROOT
 
 }
 
@@ -158,7 +161,7 @@ func ToStringE(i any) string {
 	case error:
 		return s.Error()
 	default:
-		log.Fatal(fmt.Sprintf("unable to cast %#v of type %T to string", i, i))
+		utils.Logger.Warnf("unable to cast %#v of type %T to string", i, i)
 		return ""
 	}
 }
@@ -172,4 +175,10 @@ func indirectToStringerOrError(a any) any {
 		v = v.Elem()
 	}
 	return v.Interface()
+}
+
+func UsePayloadForQueryParameters(yopRequest YopRequest) bool {
+	var requestIsPOST = strings.Compare("POST", yopRequest.HttpMethod) == 0
+	var requestHasNoPayload = len(yopRequest.Content) == 0
+	return requestIsPOST && requestHasNoPayload
 }
